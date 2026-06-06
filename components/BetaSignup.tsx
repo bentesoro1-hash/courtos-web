@@ -1,11 +1,11 @@
 'use client'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+);
 
 type FormData = { name: string; email: string; club: string; level: string; message: string }
 type FormErrors = Partial<Record<keyof FormData, string>>
@@ -18,11 +18,8 @@ function validate(data: FormData): FormErrors {
   if (!data.email.trim()) errors.email = 'Email is required'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'Enter a valid email address'
   if (!data.level) errors.level = 'Please select a coaching level'
-  return errors
-}
-
-export default function BetaSignup() {
-  const [formData, setFormData] = useState<FormData>(INITIAL)
+  re'use client'
+import { createClient } from '@supabase/supabast [formData, setFormData] = useState<FormData>(INITIAL)
   const [errors, setErrors] = useState<FormErrors>({})
   const [status, setStatus] = useState<Status>('idle')
 
@@ -66,23 +63,25 @@ export default function BetaSignup() {
     }
   }
 
-  const ic = (f: keyof FormData) =>
-    `w-full bg-court-bg border rounded-xl px-4 py-3 text-white text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors[f] ? 'border-red-500/60 focus:ring-red-500' : 'border-court-border focus:border-blue-500'}`
+  const inputClass = (field: keyof FormData) =>
+    `w-full bg-court-bg border rounded-xl px-4 py-3 text-white text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors[field] ? 'border-red-500/60 focus:ring-red-500' : 'border-court-border focus:border-blue-500'}`
 
-  if (status === 'success') return (
-    <section id="beta" className="py-20 sm:py-28 bg-court-surface relative">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-      <div className="max-w-lg mx-auto px-4 sm:px-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5">
-          <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-          </svg>
+  if (status === 'success') {
+    return (
+      <section id="beta" className="py-20 sm:py-28 bg-court-surface relative">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+        <div className="max-w-lg mx-auto px-4 sm:px-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5">
+            <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <h3 className="text-2xl font-black text-white mb-3">You&apos;re on the beta list.</h3>
+          <p className="text-slate-400 text-lg">We&apos;ll reach out soon.</p>
         </div>
-        <h3 className="text-2xl font-black text-white mb-3">You&apos;re on the beta list.</h3>
-        <p className="text-slate-400 text-lg">We&apos;ll reach out soon.</p>
-      </div>
-    </section>
-  )
+      </section>
+    )
+  }
 
   return (
     <section id="beta" className="py-20 sm:py-28 bg-court-surface relative">
@@ -94,29 +93,29 @@ export default function BetaSignup() {
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse block" />
             <span className="text-blue-400 text-xs font-semibold tracking-widest uppercase">Limited beta</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Help shape CourtOS before launch</h2>
+          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4 text-balance">Help shape CourtOS before launch</h2>
           <p className="text-slate-400 text-lg max-w-xl mx-auto">We&apos;re inviting a small group of volleyball coaches to test CourtOS during real practices, scrimmages, and tournaments.</p>
         </div>
         <div className="bg-court-bg border border-court-border rounded-2xl p-6 sm:p-8">
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="name">Name <span className="text-blue-500">*</span></label>
-              <input id="name" name="name" type="text" placeholder="Coach Sarah" value={formData.name} onChange={handleChange} className={ic('name')} />
+              <input id="name" name="name" type="text" autoComplete="name" placeholder="Coach Sarah" value={formData.name} onChange={handleChange} className={inputClass('name')} />
               {errors.name && <p className="mt-1.5 text-xs text-red-400">{errors.name}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="email">Email <span className="text-blue-500">*</span></label>
-              <input id="email" name="email" type="email" placeholder="coach@clubname.com" value={formData.email} onChange={handleChange} className={ic('email')} />
+              <input id="email" name="email" type="email" autoComplete="email" placeholder="coach@clubname.com" value={formData.email} onChange={handleChange} className={inputClass('email')} />
               {errors.email && <p className="mt-1.5 text-xs text-red-400">{errors.email}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="club">Club / School / Team</label>
-              <input id="club" name="club" type="text" placeholder="Riverside Volleyball Club" value={formData.club} onChange={handleChange} className={ic('club')} />
+              <input id="club" name="club" type="text" placeholder="Riverside Volleyball Club" value={formData.club} onChange={handleChange} className={inputClass('club')} />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="level">Coaching Level <span className="text-blue-500">*</span></label>
               <div className="relative">
-                <select id="level" name="level" value={formData.level} onChange={handleChange} className={`${ic('level')} appearance-none cursor-pointer pr-10`}>
+                <select id="level" name="level" value={formData.level} onChange={handleChange} className={`${inputClass('level')} appearance-none cursor-pointer pr-10`}>
                   <option value="" disabled>Select coaching level</option>
                   <option value="youth">Youth Coach (12U-16U)</option>
                   <option value="club">Club / AAU Coach</option>
@@ -133,12 +132,12 @@ export default function BetaSignup() {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="message">Message / Notes <span className="text-slate-500 font-normal">(optional)</span></label>
-              <textarea id="message" name="message" rows={3} placeholder="Tell us about your program..." value={formData.message} onChange={handleChange} className={`${ic('message')} resize-none`} />
+              <textarea id="message" name="message" rows={3} placeholder="Tell us about your program..." value={formData.message} onChange={handleChange} className={`${inputClass('message')} resize-none`} />
             </div>
-            <button type="submit" disabled={status === 'submitting'} className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white py-4 rounded-xl font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2 mt-2">
+            <button type="submit" disabled={status === 'submitting'} className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:shadow-[0_0_32px_rgba(59,130,246,0.4)] flex items-center justify-center gap-2 mt-2">
               {status === 'submitting' ? 'Submitting...' : 'Request Beta Access'}
             </button>
-            {status === 'error' && <p className="text-center text-sm text-red-400 mt-2">Something went wrong. Please try again or email <a href="mailto:courtos@courtos.co" className="underline">courtos@courtos.co</a>.</p>}
+            {status === 'error' && <p className="text-center text-sm text-red-400 mt-2">Something went wrong. Please try again or email <a href="mailto:courtos@courtos.co" className="underline hover:text-red-300">courtos@courtos.co</a>.</p>}
             <p className="text-center text-xs text-slate-600 mt-3">We&apos;ll never share your info. No spam, no pressure.</p>
           </form>
         </div>
