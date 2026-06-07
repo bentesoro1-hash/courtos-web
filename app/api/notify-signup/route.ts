@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const body = await req.json();
 
   await resend.emails.send({
-    from: 'CourtOS <onboarding@resend.dev>',
+    from: 'CourtOS <notifications@courtos.co>',
     to: 'bentesoro1@gmail.com',
     subject: '🏐 New CourtOS Beta Signup!',
     html: `
