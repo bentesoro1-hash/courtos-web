@@ -1,1 +1,0 @@
-self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/Users/bentesoro/courtos-web/app/layout":["static/media/e4af272ccee01ff0-s.p.woff2"],"/Users/bentesoro/courtos-web/app/live/page":["static/media/437e5f23c97e320c-s.p.woff2","static/media/67d60655232d436d-s.p.woff2","static/media/1f54c84255ccf44e-s.p.woff2"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';
