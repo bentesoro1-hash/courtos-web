@@ -1,8 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function GET() {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   const { data, error } = await resend.emails.send({
     from: 'CourtOS <hello@courtos.co>',
     to: ['bentesoro1@gmail.com'],

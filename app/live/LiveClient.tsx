@@ -60,7 +60,6 @@ export default function LiveClient() {
   const [now, setNow] = useState<Date>(() => new Date())
   const [activeCode, setActiveCode] = useState('')
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const channelRef = useRef<any>(null)
 
   useEffect(() => {
@@ -82,7 +81,6 @@ export default function LiveClient() {
     setErrorMsg('')
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from('live_matches')
         .select('*')
@@ -108,7 +106,6 @@ export default function LiveClient() {
 
       const channel = supabase
         .channel(`live_match_${clean}`)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('postgres_changes' as any, {
           event: 'UPDATE',
           schema: 'public',

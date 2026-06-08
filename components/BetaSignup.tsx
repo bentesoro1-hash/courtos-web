@@ -18,8 +18,11 @@ function validate(data: FormData): FormErrors {
   if (!data.email.trim()) errors.email = 'Email is required'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'Enter a valid email address'
   if (!data.level) errors.level = 'Please select a coaching level'
-  re'use client'
-import { createClient } from '@supabase/supabast [formData, setFormData] = useState<FormData>(INITIAL)
+  return errors
+}
+
+export default function BetaSignup() {
+  const [formData, setFormData] = useState<FormData>(INITIAL)
   const [errors, setErrors] = useState<FormErrors>({})
   const [status, setStatus] = useState<Status>('idle')
 
