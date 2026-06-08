@@ -1,5 +1,8 @@
 {
   "/_not-found/page": "/_not-found",
+  "/api/notify-signup/route": "/api/notify-signup",
   "/icon/route": "/icon",
-  "/page": "/"
+  "/api/test-email/route": "/api/test-email",
+  "/page": "/",
+  "/live/page": "/live"
 }

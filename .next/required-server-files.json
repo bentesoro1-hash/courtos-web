@@ -185,6 +185,7 @@
       "useEarlyImport": false,
       "viewTransition": false,
       "routerBFCache": false,
+      "removeUncaughtErrorAndRejectionListeners": false,
       "staleTimes": {
         "dynamic": 0,
         "static": 300

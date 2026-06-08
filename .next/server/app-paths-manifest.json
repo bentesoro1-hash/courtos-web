@@ -1,5 +1,8 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/api/notify-signup/route": "app/api/notify-signup/route.js",
   "/icon/route": "app/icon/route.js",
-  "/page": "app/page.js"
+  "/api/test-email/route": "app/api/test-email/route.js",
+  "/page": "app/page.js",
+  "/live/page": "app/live/page.js"
 }

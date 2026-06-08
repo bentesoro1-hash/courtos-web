@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 60, "column": 0}, "map": {"version":3,"sources":["file:///Users/bentesoro/courtos-web/app/api/notify-signup/route.ts"],"sourcesContent":["import { Resend } from 'resend';\nimport { NextResponse } from 'next/server';\n\nconst resend = new Resend(process.env.RESEND_API_KEY);\n\nexport async function POST(req: Request) {\n  const body = await req.json();\n\n  await resend.emails.send({\n    from: 'CourtOS <onboarding@resend.dev>',\n    to: 'bentesoro1@gmail.com',\n    subject: '🏐 New CourtOS Beta Signup!',\n    html: `\n      <h2>New Beta Signup</h2>\n      <p><strong>Name:</strong> ${body.name}</p>\n      <p><strong>Email:</strong> ${body.email}</p>\n      <p><strong>Club/Team:</strong> ${body.organization}</p>\n      <p><strong>Level:</strong> ${body.coaching_level}</p>\n      <p><strong>Notes:</strong> ${body.frustration}</p>\n    `,\n  });\n\n  return NextResponse.json({ ok: true });\n}\n"],"names":[],"mappings":";;;AAAA;AACA;;;AAEA,MAAM,SAAS,IAAI,0IAAA,CAAA,SAAM,CAAC,QAAQ,GAAG,CAAC,cAAc;AAE7C,eAAe,KAAK,GAAY;IACrC,MAAM,OAAO,MAAM,IAAI,IAAI;IAE3B,MAAM,OAAO,MAAM,CAAC,IAAI,CAAC;QACvB,MAAM;QACN,IAAI;QACJ,SAAS;QACT,MAAM,CAAC;;gCAEqB,EAAE,KAAK,IAAI,CAAC;iCACX,EAAE,KAAK,KAAK,CAAC;qCACT,EAAE,KAAK,YAAY,CAAC;iCACxB,EAAE,KAAK,cAAc,CAAC;iCACtB,EAAE,KAAK,WAAW,CAAC;IAChD,CAAC;IACH;IAEA,OAAO,gIAAA,CAAA,eAAY,CAAC,IAAI,CAAC;QAAE,IAAI;IAAK;AACtC","debugId":null}}]
-}
