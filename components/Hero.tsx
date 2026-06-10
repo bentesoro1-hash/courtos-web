@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center pt-16 overflow-hidden bg-court-bg">
@@ -140,9 +142,13 @@ function PhoneMockup() {
           {/* App header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 rounded-md bg-blue-600 flex items-center justify-center shrink-0">
-                <span className="text-[9px] font-black text-white">C</span>
-              </div>
+              <Image
+                src="/images/logo-icon.png"
+                alt="CourtOS"
+                width={20}
+                height={20}
+                className="rounded-md shrink-0"
+              />
               <span className="text-white text-[13px] font-bold">CourtOS</span>
             </div>
             <div className="flex items-center gap-1">

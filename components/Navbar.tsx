@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -25,19 +26,15 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-500 transition-colors">
-              <svg
-                className="w-4 h-4 text-white"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM3.5 8a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Z" />
-                <path d="M5.5 8a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0Z" />
-              </svg>
-            </div>
-            <span className="text-white font-bold text-lg tracking-tight">CourtOS</span>
+          <a href="#" className="flex items-center group">
+            <Image
+              src="/images/logo-horizontal-white.svg"
+              alt="CourtOS"
+              width={140}
+              height={73}
+              priority
+              className="h-9 w-auto"
+            />
           </a>
 
           {/* Desktop nav */}
