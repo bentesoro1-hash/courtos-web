@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
@@ -15,105 +14,141 @@ export default function Navbar() {
 
   const closeMenu = () => setMenuOpen(false)
 
+  const NAV_LINKS = [
+    { label: 'Features', href: '#features' },
+    { label: 'How It Works', href: '#how-it-works' },
+    { label: 'Beta', href: '#beta' },
+  ]
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-court-bg/95 backdrop-blur-md border-b border-court-border'
-          : 'bg-transparent'
-      }`}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        background: scrolled ? 'rgba(12,12,12,0.96)' : '#0C0C0C',
+        borderBottom: `1px solid ${scrolled ? '#242424' : 'transparent'}`,
+        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
+        transition: 'all 0.3s ease',
+      }}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <a href="#" className="flex items-center group">
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+          <a href="#" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             <Image
-              src="/images/logo-horizontal-white.svg"
+              src="/logo.png"
               alt="CourtOS"
-              width={140}
-              height={73}
+              width={120}
+              height={28}
               priority
-              className="h-9 w-auto"
+              style={{ height: 28, width: 'auto' }}
             />
           </a>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
-            >
-              Features
-            </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden md:flex">
+            {NAV_LINKS.map(link => (
+              <a
+                key={link.label}
+                href={link.href}
+                style={{ color: '#888', fontSize: 14, textDecoration: 'none', transition: 'color 0.2s' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#F0F0F0')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#888')}
+              >
+                {link.label}
+              </a>
+            ))}
             <a
               href="#beta"
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
-            >
-              Beta
-            </a>
-            <a
-              href="#beta"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              style={{
+                background: '#3DBE6B',
+                color: '#000',
+                padding: '10px 20px',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 700,
+                textTransform: 'uppercase' as const,
+                textDecoration: 'none',
+                letterSpacing: '0.04em',
+                transition: 'background 0.2s, transform 0.15s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#4FD080'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#3DBE6B'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
             >
               Join Beta
             </a>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle navigation"
-            aria-expanded={menuOpen}
-          >
-            <div className="w-5 h-4 flex flex-col justify-between">
-              <span
-                className={`block h-0.5 bg-current rounded transition-transform duration-200 ${
-                  menuOpen ? 'rotate-45 translate-y-[7px]' : ''
-                }`}
-              />
-              <span
-                className={`block h-0.5 bg-current rounded transition-opacity duration-200 ${
-                  menuOpen ? 'opacity-0' : ''
-                }`}
-              />
-              <span
-                className={`block h-0.5 bg-current rounded transition-transform duration-200 ${
-                  menuOpen ? '-rotate-45 -translate-y-[7px]' : ''
-                }`}
-              />
-            </div>
-          </button>
+          {/* Mobile right side */}
+          <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <a
+              href="#beta"
+              style={{
+                background: '#3DBE6B',
+                color: '#000',
+                padding: '8px 14px',
+                borderRadius: 8,
+                fontSize: 12,
+                fontWeight: 700,
+                textTransform: 'uppercase' as const,
+                textDecoration: 'none',
+              }}
+            >
+              Join Beta
+            </a>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
+              aria-label="Toggle menu"
+            >
+              <div style={{ width: 20, height: 16, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                {[0, 1, 2].map(i => (
+                  <span key={i} style={{
+                    display: 'block', height: 2, background: '#F0F0F0', borderRadius: 1,
+                    transition: 'all 0.2s',
+                    transform: menuOpen
+                      ? i === 0 ? 'rotate(45deg) translateY(7px)'
+                        : i === 2 ? 'rotate(-45deg) translateY(-7px)'
+                        : 'none'
+                      : 'none',
+                    opacity: menuOpen && i === 1 ? 0 : 1,
+                  }} />
+                ))}
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ${
-            menuOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
-          }`}
+          className="md:hidden"
+          style={{
+            overflow: 'hidden',
+            maxHeight: menuOpen ? 220 : 0,
+            opacity: menuOpen ? 1 : 0,
+            transition: 'all 0.3s ease',
+          }}
         >
-          <div className="border-t border-court-border pt-4 pb-4 flex flex-col gap-3">
-            <a
-              href="#features"
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium px-1 py-1"
-              onClick={closeMenu}
-            >
-              Features
-            </a>
-            <a
-              href="#beta"
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium px-1 py-1"
-              onClick={closeMenu}
-            >
-              Beta
-            </a>
-            <a
-              href="#beta"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors text-center"
-              onClick={closeMenu}
-            >
-              Join Beta
-            </a>
+          <div style={{ borderTop: '1px solid #242424', paddingTop: 16, paddingBottom: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {NAV_LINKS.map(link => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={closeMenu}
+                style={{ color: '#888', fontSize: 15, textDecoration: 'none', padding: '4px 0' }}
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
         </div>
       </div>

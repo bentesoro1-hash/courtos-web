@@ -1,147 +1,355 @@
 'use client'
-import { createClient } from '@supabase/supabase-js';
 import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+)
 
-type FormData = { name: string; email: string; club: string; level: string; message: string }
-type FormErrors = Partial<Record<keyof FormData, string>>
+const ROLES = [
+  { value: 'head_coach', label: '🏐 Head Coach' },
+  { value: 'new_coach', label: '🆕 First-Year / New Coach' },
+  { value: 'parent_volunteer', label: '👨‍👧 Parent Volunteer' },
+  { value: 'athletic_director', label: '🏫 Athletic Director / Admin' },
+  { value: 'player', label: '🏃 Player (my own stats)' },
+  { value: 'just_interested', label: '👀 Just Interested' },
+]
+
+type FormData = { name: string; email: string; organization: string; role: string; message: string }
+type FormErrors = Partial<Record<'name' | 'email' | 'role', string>>
 type Status = 'idle' | 'submitting' | 'success' | 'error'
-const INITIAL: FormData = { name: '', email: '', club: '', level: '', message: '' }
+
+const EMPTY: FormData = { name: '', email: '', organization: '', role: '', message: '' }
 
 function validate(data: FormData): FormErrors {
   const errors: FormErrors = {}
   if (!data.name.trim() || data.name.trim().length < 2) errors.name = 'Name is required'
   if (!data.email.trim()) errors.email = 'Email is required'
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'Enter a valid email address'
-  if (!data.level) errors.level = 'Please select a coaching level'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'Enter a valid email'
+  if (!data.role) errors.role = 'Please select a role'
   return errors
 }
 
+const INPUT_BASE: React.CSSProperties = {
+  width: '100%',
+  background: '#0C0C0C',
+  border: '1px solid #2a2a2a',
+  borderRadius: 8,
+  padding: '12px 14px',
+  color: '#F0F0F0',
+  fontSize: 14,
+  outline: 'none',
+  transition: 'border-color 0.2s',
+}
+
 export default function BetaSignup() {
-  const [formData, setFormData] = useState<FormData>(INITIAL)
+  const [formData, setFormData] = useState<FormData>(EMPTY)
   const [errors, setErrors] = useState<FormErrors>({})
   const [status, setStatus] = useState<Status>('idle')
+  const [copied, setCopied] = useState(false)
 
-  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name as keyof FormData]) setErrors((prev) => ({ ...prev, [name]: undefined }))
+    setFormData(prev => ({ ...prev, [name]: value }))
+    if (errors[name as keyof FormErrors]) setErrors(prev => ({ ...prev, [name]: undefined }))
+  }
+
+  function selectRole(value: string) {
+    setFormData(prev => ({ ...prev, role: value }))
+    if (errors.role) setErrors(prev => ({ ...prev, role: undefined }))
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    const validationErrors = validate(formData)
-    if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return }
+    const v = validate(formData)
+    if (Object.keys(v).length > 0) { setErrors(v); return }
     setStatus('submitting')
     try {
       const { error } = await supabase.from('beta_signups').insert([{
-        name: formData.name,
-        email: formData.email,
-        organization: formData.club,
-        coaching_level: formData.level,
-        frustration: formData.message,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        organization: formData.organization.trim() || null,
+        coaching_level: formData.role,
+        frustration: formData.message.trim() || null,
         source: 'courtos.co/beta',
       }])
       if (error) throw error
-
       await fetch('/api/notify-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          organization: formData.club,
-          coaching_level: formData.level,
+          organization: formData.organization,
+          coaching_level: formData.role,
           frustration: formData.message,
         }),
       })
-
       setStatus('success')
     } catch {
       setStatus('error')
     }
   }
 
-  const inputClass = (field: keyof FormData) =>
-    `w-full bg-court-bg border rounded-xl px-4 py-3 text-white text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors[field] ? 'border-red-500/60 focus:ring-red-500' : 'border-court-border focus:border-blue-500'}`
+  async function handleShare() {
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://courtos.co'
+    if (navigator.share) {
+      await navigator.share({ title: 'CourtOS Beta', url })
+    } else {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   if (status === 'success') {
     return (
-      <section id="beta" className="py-20 sm:py-28 bg-court-surface relative">
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-        <div className="max-w-lg mx-auto px-4 sm:px-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5">
-            <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
+      <section id="beta" style={{ background: '#090909', padding: '100px 24px', borderTop: '1px solid #181818' }}>
+        <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: '50%',
+            background: 'rgba(61,190,107,0.1)',
+            border: '2px solid rgba(61,190,107,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 28px', fontSize: 32,
+          }}>
+            ✓
           </div>
-          <h3 className="text-2xl font-black text-white mb-3">You&apos;re on the beta list.</h3>
-          <p className="text-slate-400 text-lg">We&apos;ll reach out soon.</p>
+          <h2
+            className="font-bebas"
+            style={{
+              fontSize: 'clamp(48px, 6vw, 72px)',
+              lineHeight: 1,
+              color: '#3DBE6B',
+              letterSpacing: '0.02em',
+              marginBottom: 12,
+            }}
+          >
+            YOU&apos;RE IN.
+          </h2>
+          <p style={{ color: '#888', fontSize: 17, marginBottom: 32 }}>
+            We&apos;ll be in touch soon with your beta access details.
+          </p>
+          <button
+            onClick={handleShare}
+            style={{
+              background: '#1a1a1a',
+              border: '1px solid #2a2a2a',
+              color: '#F0F0F0',
+              padding: '12px 28px',
+              borderRadius: 8,
+              fontSize: 14, fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = '#3DBE6B'
+              e.currentTarget.style.color = '#3DBE6B'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#2a2a2a'
+              e.currentTarget.style.color = '#F0F0F0'
+            }}
+          >
+            {copied ? '✓ Link Copied!' : '🔗 Share CourtOS'}
+          </button>
         </div>
       </section>
     )
   }
 
   return (
-    <section id="beta" className="py-20 sm:py-28 bg-court-surface relative">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(37,99,235,0.08)_0%,transparent_70%)]" />
-      <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/20 rounded-full px-4 py-1.5 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse block" />
-            <span className="text-blue-400 text-xs font-semibold tracking-widest uppercase">Limited beta</span>
+    <section id="beta" style={{ background: '#090909', padding: '100px 24px', borderTop: '1px solid #181818' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: 'rgba(61,190,107,0.08)',
+            border: '1px solid rgba(61,190,107,0.2)',
+            borderRadius: 100, padding: '6px 14px', marginBottom: 20,
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3DBE6B', display: 'inline-block' }} />
+            <span style={{ color: '#3DBE6B', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              Limited Beta Spots
+            </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4 text-balance">Help shape CourtOS before launch</h2>
-          <p className="text-slate-400 text-lg max-w-xl mx-auto">We&apos;re inviting a small group of volleyball coaches to test CourtOS during real practices, scrimmages, and tournaments.</p>
+          <h2
+            className="font-bebas"
+            style={{
+              fontSize: 'clamp(44px, 6vw, 72px)',
+              lineHeight: 1,
+              color: '#F0F0F0',
+              letterSpacing: '0.02em',
+              marginBottom: 16,
+            }}
+          >
+            JOIN THE BETA.
+          </h2>
+          <p style={{ color: '#888', fontSize: 16, maxWidth: 460, margin: '0 auto' }}>
+            We&apos;re inviting a small group of coaches to test CourtOS before launch.
+            Free to join. No credit card. Just real games.
+          </p>
         </div>
-        <div className="bg-court-bg border border-court-border rounded-2xl p-6 sm:p-8">
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="name">Name <span className="text-blue-500">*</span></label>
-              <input id="name" name="name" type="text" autoComplete="name" placeholder="Coach Sarah" value={formData.name} onChange={handleChange} className={inputClass('name')} />
-              {errors.name && <p className="mt-1.5 text-xs text-red-400">{errors.name}</p>}
+
+        <div style={{
+          background: '#141414',
+          border: '1px solid #242424',
+          borderRadius: 20,
+          padding: '36px 32px',
+        }}>
+          <form onSubmit={handleSubmit} noValidate>
+
+            {/* Name */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                Name <span style={{ color: '#3DBE6B' }}>*</span>
+              </label>
+              <input
+                name="name"
+                type="text"
+                autoComplete="name"
+                placeholder="Coach Sarah"
+                value={formData.name}
+                onChange={handleChange}
+                style={{
+                  ...INPUT_BASE,
+                  borderColor: errors.name ? '#ef4444' : '#2a2a2a',
+                }}
+                onFocus={e => (e.currentTarget.style.borderColor = errors.name ? '#ef4444' : '#3DBE6B')}
+                onBlur={e => (e.currentTarget.style.borderColor = errors.name ? '#ef4444' : '#2a2a2a')}
+              />
+              {errors.name && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{errors.name}</p>}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="email">Email <span className="text-blue-500">*</span></label>
-              <input id="email" name="email" type="email" autoComplete="email" placeholder="coach@clubname.com" value={formData.email} onChange={handleChange} className={inputClass('email')} />
-              {errors.email && <p className="mt-1.5 text-xs text-red-400">{errors.email}</p>}
+
+            {/* Email */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                Email <span style={{ color: '#3DBE6B' }}>*</span>
+              </label>
+              <input
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="coach@clubname.com"
+                value={formData.email}
+                onChange={handleChange}
+                style={{
+                  ...INPUT_BASE,
+                  borderColor: errors.email ? '#ef4444' : '#2a2a2a',
+                }}
+                onFocus={e => (e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#3DBE6B')}
+                onBlur={e => (e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#2a2a2a')}
+              />
+              {errors.email && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{errors.email}</p>}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="club">Club / School / Team</label>
-              <input id="club" name="club" type="text" placeholder="Riverside Volleyball Club" value={formData.club} onChange={handleChange} className={inputClass('club')} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="level">Coaching Level <span className="text-blue-500">*</span></label>
-              <div className="relative">
-                <select id="level" name="level" value={formData.level} onChange={handleChange} className={`${inputClass('level')} appearance-none cursor-pointer pr-10`}>
-                  <option value="" disabled>Select coaching level</option>
-                  <option value="youth">Youth Coach (12U-16U)</option>
-                  <option value="club">Club / AAU Coach</option>
-                  <option value="high-school">High School Coach (JV / Varsity)</option>
-                  <option value="collegiate-club">Collegiate Club Coach</option>
-                  <option value="private">Private / Independent Coach</option>
-                  <option value="other">Other</option>
-                </select>
-                <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                </div>
+
+            {/* Role selector */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                I am a... <span style={{ color: '#3DBE6B' }}>*</span>
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {ROLES.map(role => {
+                  const selected = formData.role === role.value
+                  return (
+                    <button
+                      key={role.value}
+                      type="button"
+                      onClick={() => selectRole(role.value)}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        background: selected ? 'rgba(61,190,107,0.12)' : '#1a1a1a',
+                        border: `1px solid ${selected ? '#3DBE6B' : '#2a2a2a'}`,
+                        color: selected ? '#3DBE6B' : '#888',
+                      }}
+                    >
+                      {role.label}
+                    </button>
+                  )
+                })}
               </div>
-              {errors.level && <p className="mt-1.5 text-xs text-red-400">{errors.level}</p>}
+              {errors.role && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 8 }}>{errors.role}</p>}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="message">Message / Notes <span className="text-slate-500 font-normal">(optional)</span></label>
-              <textarea id="message" name="message" rows={3} placeholder="Tell us about your program..." value={formData.message} onChange={handleChange} className={`${inputClass('message')} resize-none`} />
+
+            {/* Organization */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                Club / School / Team <span style={{ color: '#555', fontWeight: 400 }}>(optional)</span>
+              </label>
+              <input
+                name="organization"
+                type="text"
+                placeholder="Riverside Volleyball Club"
+                value={formData.organization}
+                onChange={handleChange}
+                style={INPUT_BASE}
+                onFocus={e => (e.currentTarget.style.borderColor = '#3DBE6B')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#2a2a2a')}
+              />
             </div>
-            <button type="submit" disabled={status === 'submitting'} className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:shadow-[0_0_32px_rgba(59,130,246,0.4)] flex items-center justify-center gap-2 mt-2">
-              {status === 'submitting' ? 'Submitting...' : 'Request Beta Access'}
+
+            {/* Message */}
+            <div style={{ marginBottom: 28 }}>
+              <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                What&apos;s your biggest headache on game day? <span style={{ color: '#555', fontWeight: 400 }}>(optional)</span>
+              </label>
+              <textarea
+                name="message"
+                rows={3}
+                placeholder="Tell us what drives you crazy..."
+                value={formData.message}
+                onChange={handleChange}
+                style={{ ...INPUT_BASE, resize: 'none' }}
+                onFocus={e => (e.currentTarget.style.borderColor = '#3DBE6B')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#2a2a2a')}
+              />
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={status === 'submitting'}
+              style={{
+                width: '100%',
+                background: '#3DBE6B',
+                color: '#000',
+                padding: '16px 0',
+                borderRadius: 8,
+                fontSize: 14,
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                border: 'none',
+                cursor: status === 'submitting' ? 'not-allowed' : 'pointer',
+                opacity: status === 'submitting' ? 0.7 : 1,
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                if (status !== 'submitting') e.currentTarget.style.background = '#4FD080'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#3DBE6B'
+              }}
+            >
+              {status === 'submitting' ? 'Submitting...' : 'Get Early Access →'}
             </button>
-            {status === 'error' && <p className="text-center text-sm text-red-400 mt-2">Something went wrong. Please try again or email <a href="mailto:courtos@courtos.co" className="underline hover:text-red-300">courtos@courtos.co</a>.</p>}
-            <p className="text-center text-xs text-slate-600 mt-3">We&apos;ll never share your info. No spam, no pressure.</p>
+
+            {status === 'error' && (
+              <p style={{ color: '#ef4444', fontSize: 13, textAlign: 'center', marginTop: 16 }}>
+                Something went wrong. Please try again.
+              </p>
+            )}
+
+            <p style={{ color: '#444', fontSize: 12, textAlign: 'center', marginTop: 16 }}>
+              Free during beta · No credit card · No spam
+            </p>
           </form>
         </div>
       </div>

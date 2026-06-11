@@ -1,29 +1,35 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Bebas_Neue } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-bebas',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'CourtOS — The Coaching OS for Volleyball',
+  title: 'CourtOS — Your Entire Coaching Staff. One Tap.',
   description:
-    'CourtOS helps volleyball coaches track rotations, substitutions, stats, and match flow in one simple sideline app.',
+    'CourtOS replaces your scorekeeper, rotation tracker, sub coordinator, and stats person — all in one sideline app for volleyball coaches.',
   metadataBase: new URL('https://courtos.co'),
   openGraph: {
-    title: 'CourtOS — The Coaching OS for Volleyball',
+    title: 'CourtOS — Your Entire Coaching Staff. One Tap.',
     description:
-      'CourtOS helps volleyball coaches track rotations, substitutions, stats, and match flow in one simple sideline app.',
+      'CourtOS replaces your scorekeeper, rotation tracker, sub coordinator, and stats person — all in one sideline app for volleyball coaches.',
     type: 'website',
     url: 'https://courtos.co',
     siteName: 'CourtOS',
-    images: [{ url: '/images/logo-full-tagline.svg', width: 1200, height: 630 }],
+    images: [{ url: '/logo.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CourtOS — The Coaching OS for Volleyball',
+    title: 'CourtOS — Your Entire Coaching Staff. One Tap.',
     description:
-      'CourtOS helps volleyball coaches track rotations, substitutions, stats, and match flow in one simple sideline app.',
-    images: ['/images/logo-full-tagline.svg'],
+      'CourtOS replaces your scorekeeper, rotation tracker, sub coordinator, and stats person — all in one sideline app for volleyball coaches.',
+    images: ['/logo.png'],
   },
   icons: {
     icon: [
@@ -38,13 +44,13 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/site.webmanifest',
-  themeColor: '#060b14',
+  themeColor: '#0C0C0C',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="bg-court-bg text-white font-[var(--font-inter)] antialiased">
+    <html lang="en" className={`${inter.variable} ${bebasNeue.variable}`}>
+      <body className="bg-[#0C0C0C] text-white font-[family-name:var(--font-inter)] antialiased">
         {children}
       </body>
     </html>

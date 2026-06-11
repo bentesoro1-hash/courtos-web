@@ -1,9 +1,11 @@
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
-import ProblemSection from '@/components/ProblemSection'
+import NoAssistantNeeded from '@/components/NoAssistantNeeded'
+import Agitation from '@/components/Agitation'
+import AppTease from '@/components/AppTease'
 import FeaturesSection from '@/components/FeaturesSection'
+import HowItWorks from '@/components/HowItWorks'
 import BetaSignup from '@/components/BetaSignup'
-import SocialProof from '@/components/SocialProof'
 import FinalCTA from '@/components/FinalCTA'
 import Footer from '@/components/Footer'
 
@@ -13,10 +15,12 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <ProblemSection />
+        <NoAssistantNeeded />
+        <Agitation />
+        <AppTease />
         <FeaturesSection />
+        <HowItWorks />
         <BetaSignup />
-        <SocialProof />
         <FinalCTA />
       </main>
       <Footer />

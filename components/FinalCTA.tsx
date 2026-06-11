@@ -1,39 +1,92 @@
+'use client'
+import Image from 'next/image'
+
 export default function FinalCTA() {
   return (
-    <section className="py-20 sm:py-28 relative overflow-hidden bg-court-bg">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+    <section style={{ background: '#0C0C0C', padding: '120px 24px', textAlign: 'center', borderTop: '1px solid #1a1a1a', position: 'relative', overflow: 'hidden' }}>
+      {/* Green glow */}
+      <div style={{
+        position: 'absolute', bottom: '-20%', left: '50%', transform: 'translateX(-50%)',
+        width: 600, height: 300,
+        background: 'radial-gradient(ellipse, rgba(61,190,107,0.08) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
 
-      {/* Blue gradient background glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(37,99,235,0.14)_0%,transparent_70%)]" />
-      {/* Court grid */}
-      <div className="absolute inset-0 bg-court-grid opacity-50" />
-
-      {/* Decorative court lines */}
-      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none select-none opacity-10">
-        <div
-          className="w-[520px] h-[320px] border-2 border-blue-400 rounded-sm"
-          aria-hidden="true"
+      <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative' }}>
+        <Image
+          src="/logo.png"
+          alt="CourtOS"
+          width={160}
+          height={40}
+          style={{ height: 40, width: 'auto', margin: '0 auto 48px', display: 'block' }}
         />
-      </div>
-      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none select-none opacity-10">
-        <div className="w-px h-[320px] bg-blue-400" aria-hidden="true" />
-      </div>
 
-      <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-5 text-balance">
-          Ready to coach with less chaos?
+        <h2
+          className="font-bebas"
+          style={{
+            fontSize: 'clamp(52px, 8vw, 96px)',
+            lineHeight: 1,
+            color: '#F0F0F0',
+            letterSpacing: '0.02em',
+            marginBottom: 10,
+          }}
+        >
+          YOUR ENTIRE
         </h2>
-        <p className="text-slate-400 text-lg mb-8 max-w-md mx-auto">
-          Join the beta and help shape the app before it launches.
-        </p>
+        <h2
+          className="font-bebas"
+          style={{
+            fontSize: 'clamp(52px, 8vw, 96px)',
+            lineHeight: 1,
+            color: '#3DBE6B',
+            letterSpacing: '0.02em',
+            marginBottom: 10,
+          }}
+        >
+          COACHING STAFF.
+        </h2>
+        <h2
+          className="font-bebas"
+          style={{
+            fontSize: 'clamp(52px, 8vw, 96px)',
+            lineHeight: 1,
+            color: '#F0F0F0',
+            letterSpacing: '0.02em',
+            marginBottom: 52,
+          }}
+        >
+          ONE TAP.
+        </h2>
+
         <a
           href="#beta"
-          className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-200 hover:shadow-[0_0_48px_rgba(59,130,246,0.5)]"
+          style={{
+            display: 'inline-block',
+            background: '#3DBE6B',
+            color: '#000',
+            padding: '18px 52px',
+            borderRadius: 8,
+            fontSize: 15,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            textDecoration: 'none',
+            letterSpacing: '0.06em',
+            transition: 'background 0.2s, transform 0.15s',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = '#4FD080'
+            e.currentTarget.style.transform = 'translateY(-2px)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = '#3DBE6B'
+            e.currentTarget.style.transform = 'translateY(0)'
+          }}
         >
-          Join the Beta
+          Get Early Access →
         </a>
-        <p className="text-slate-600 text-sm mt-5">
-          Free to join. No credit card required.
+
+        <p style={{ color: '#444', fontSize: 13, marginTop: 20 }}>
+          Free during beta · No credit card required
         </p>
       </div>
     </section>

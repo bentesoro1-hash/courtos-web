@@ -1,98 +1,113 @@
-const features = [
+'use client'
+
+const FEATURES = [
   {
-    icon: (
-      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-      </svg>
-    ),
-    title: 'Live Match Tracking',
-    description:
-      "Record points, sideouts, and timeouts as they happen. Every play logged in real time — no pen, no clipboard, no lag.",
+    icon: '⚡',
+    title: 'Auto-Rotation',
+    desc: 'Point scored → rotation advances automatically. No manual tracking. No forgetting. Just volleyball.',
   },
   {
-    icon: (
-      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-      </svg>
-    ),
-    title: 'Rotation Management',
-    description:
-      "See your full lineup at a glance. CourtOS advances the rotation automatically with each serve so you never lose track mid-set.",
+    icon: '🔀',
+    title: 'Smart Substitutions',
+    desc: 'Define your sub rules once. CourtOS alerts you at the right moment and tracks every swap for you.',
   },
   {
-    icon: (
-      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-      </svg>
-    ),
-    title: 'Auto Subs & Libero Tracking',
-    description:
-      "Define your substitution rules once. CourtOS alerts you when it's time to swap and tracks libero replacements automatically.",
+    icon: '📊',
+    title: 'Live Player Stats',
+    desc: 'Kills, Assists, Errors, Aces, Digs — tracked per player, per set, per match. In real time.',
   },
   {
-    icon: (
-      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
-      </svg>
-    ),
-    title: 'Simple Stats',
-    description:
-      "Track kills, errors, aces, digs, and blocks without a full stats crew. Designed for one coach doing it all from the sideline.",
+    icon: '🏐',
+    title: 'Libero Enforcement',
+    desc: 'Back-row rules are applied automatically. Libero swaps are tracked without you thinking about it.',
   },
   {
-    icon: (
-      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-      </svg>
-    ),
-    title: 'Point Mapping',
-    description:
-      "See where you win and lose points on a court visualization after each set. Spot patterns while the game is still fresh.",
+    icon: '📋',
+    title: 'Full Match History',
+    desc: 'Every rotation, sub, and set score saved permanently. Review before your next matchup.',
   },
   {
-    icon: (
-      <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-      </svg>
-    ),
-    title: 'Match History',
-    description:
-      "Every rotation, sub, and set score from every match — searchable and ready to review before the next one.",
+    icon: '🔴',
+    title: 'Live Broadcast',
+    desc: 'Share a live view with parents via a 4-digit room code. No app download required on their end.',
   },
 ]
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-20 sm:py-28 relative bg-court-bg">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/20 rounded-full px-4 py-1.5 mb-5">
-            <span className="text-blue-400 text-xs font-semibold tracking-widest uppercase">
-              Features
-            </span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4 text-balance">
-            Everything coaches need during a match
+    <section id="features" style={{ background: '#0C0C0C', padding: '100px 24px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 64 }}>
+          <p style={{ color: '#3DBE6B', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 16 }}>
+            Features
+          </p>
+          <h2
+            className="font-bebas"
+            style={{
+              fontSize: 'clamp(44px, 6vw, 72px)',
+              lineHeight: 1,
+              color: '#F0F0F0',
+              letterSpacing: '0.02em',
+              marginBottom: 12,
+            }}
+          >
+            NO THINKING REQUIRED.
           </h2>
-          <p className="text-slate-400 text-lg max-w-lg mx-auto">
-            No unnecessary complexity. No stat crew required. Just the tools you
-            actually use when the score is close and the clock is running.
+          <h2
+            className="font-bebas"
+            style={{
+              fontSize: 'clamp(44px, 6vw, 72px)',
+              lineHeight: 1,
+              color: '#3DBE6B',
+              letterSpacing: '0.02em',
+              marginBottom: 20,
+            }}
+          >
+            JUST COACH.
+          </h2>
+          <p style={{ color: '#888', fontSize: 17, maxWidth: 460, margin: '0 auto' }}>
+            Everything you need during a match. Nothing you don&apos;t.
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {features.map((f, i) => (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 16,
+        }}>
+          {FEATURES.map((feat) => (
             <div
-              key={i}
-              className="group bg-court-surface border border-court-border rounded-2xl p-6 hover:border-blue-500/30 hover:bg-[#0F1A38] transition-all duration-200"
+              key={feat.title}
+              style={{
+                background: '#141414',
+                border: '1px solid #242424',
+                borderRadius: 16,
+                padding: '28px 24px',
+                transition: 'all 0.25s ease',
+                cursor: 'default',
+              }}
+              onMouseEnter={e => {
+                const el = e.currentTarget
+                el.style.transform = 'translateY(-4px)'
+                el.style.borderColor = '#3DBE6B'
+                el.style.boxShadow = '0 0 24px rgba(61,190,107,0.15)'
+                el.style.background = '#1A1A1A'
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget
+                el.style.transform = 'translateY(0)'
+                el.style.borderColor = '#242424'
+                el.style.boxShadow = 'none'
+                el.style.background = '#141414'
+              }}
             >
-              <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mb-4 group-hover:bg-blue-600/20 transition-colors">
-                {f.icon}
-              </div>
-              <h3 className="text-white font-bold text-base mb-2">{f.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{f.description}</p>
+              <div style={{ fontSize: 28, marginBottom: 16 }}>{feat.icon}</div>
+              <h3 style={{ color: '#F0F0F0', fontSize: 18, fontWeight: 700, marginBottom: 10 }}>
+                {feat.title}
+              </h3>
+              <p style={{ color: '#666', fontSize: 14, lineHeight: 1.65, margin: 0 }}>
+                {feat.desc}
+              </p>
             </div>
           ))}
         </div>
