@@ -49,7 +49,7 @@ export default function Navbar() {
           </a>
 
           {/* Desktop nav */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden md:flex">
+          <div style={{ alignItems: 'center', gap: 32 }} className="hidden md:flex">
             {NAV_LINKS.map(link => (
               <a
                 key={link.label}
@@ -89,7 +89,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile right side */}
-          <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="flex md:hidden" style={{ alignItems: 'center', gap: 12 }}>
             <a
               href="#beta"
               style={{

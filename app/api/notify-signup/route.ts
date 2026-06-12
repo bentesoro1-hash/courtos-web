@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
   await resend.emails.send({
     from: 'CourtOS <hello@courtos.co>',
-    to: 'bentesoro1@gmail.com',
+    to: 'courtos@courtos.co',
     subject: '🏐 New CourtOS Beta Signup!',
     html: `
       <h2>New Beta Signup</h2>

@@ -22,14 +22,14 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://courtos.co',
     siteName: 'CourtOS',
-    images: [{ url: '/logo.png', width: 1200, height: 630 }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CourtOS — Your Entire Coaching Staff. One Tap.',
     description:
       'CourtOS replaces your scorekeeper, rotation tracker, sub coordinator, and stats person — all in one sideline app for volleyball coaches.',
-    images: ['/logo.png'],
+    images: ['/og-image.png'],
   },
   icons: {
     icon: [
