@@ -26,7 +26,7 @@ export default function HowItWorks() {
     <section id="how-it-works" style={{ background: '#090909', padding: '100px 24px', borderTop: '1px solid #181818' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 64 }}>
-          <p style={{ color: '#3DBE6B', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 16 }}>
+          <p style={{ color: '#22c55e', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 16 }}>
             How It Works
           </p>
           <h2
@@ -39,7 +39,7 @@ export default function HowItWorks() {
             }}
           >
             FROM ZERO TO GAME READY<br />
-            <span style={{ color: '#3DBE6B' }}>IN 3 STEPS.</span>
+            <span style={{ color: '#22c55e' }}>IN 3 STEPS.</span>
           </h2>
         </div>
 
@@ -54,7 +54,7 @@ export default function HowItWorks() {
                   top: 56,
                   bottom: 0,
                   width: 1,
-                  background: 'linear-gradient(to bottom, #3DBE6B40, transparent)',
+                  background: 'linear-gradient(to bottom, #22c55e40, transparent)',
                 }} />
               )}
 
@@ -64,12 +64,12 @@ export default function HowItWorks() {
                   width: 48, height: 48,
                   borderRadius: '50%',
                   background: '#141414',
-                  border: '2px solid #3DBE6B',
+                  border: '2px solid #22c55e',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
-                  boxShadow: '0 0 16px rgba(61,190,107,0.2)',
+                  boxShadow: '0 0 16px rgba(34,197,94,0.2)',
                 }}>
-                  <span className="font-bebas" style={{ color: '#3DBE6B', fontSize: 20 }}>{step.step}</span>
+                  <span className="font-bebas" style={{ color: '#22c55e', fontSize: 20 }}>{step.step}</span>
                 </div>
 
                 {/* Content */}
@@ -83,8 +83,8 @@ export default function HowItWorks() {
                 }}
                   onMouseEnter={e => {
                     const el = e.currentTarget
-                    el.style.borderColor = '#3DBE6B'
-                    el.style.boxShadow = '0 0 20px rgba(61,190,107,0.1)'
+                    el.style.borderColor = '#22c55e'
+                    el.style.boxShadow = '0 0 20px rgba(34,197,94,0.1)'
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget
@@ -97,9 +97,9 @@ export default function HowItWorks() {
                       {step.title}
                     </h3>
                     <span style={{
-                      background: 'rgba(61,190,107,0.1)',
-                      border: '1px solid rgba(61,190,107,0.3)',
-                      color: '#3DBE6B',
+                      background: 'rgba(34,197,94,0.1)',
+                      border: '1px solid rgba(34,197,94,0.3)',
+                      color: '#22c55e',
                       fontSize: 9, fontWeight: 800,
                       letterSpacing: '0.08em',
                       padding: '3px 10px', borderRadius: 20,

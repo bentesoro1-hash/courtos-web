@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import DownloadButton from './DownloadButton'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -15,9 +16,8 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false)
 
   const NAV_LINKS = [
-    { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Beta', href: '#beta' },
+    { label: 'Features', href: '#how-it-works' },
+    { label: 'Pricing', href: '#pricing' },
   ]
 
   return (
@@ -61,50 +61,12 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            <a
-              href="#beta"
-              style={{
-                background: '#3DBE6B',
-                color: '#000',
-                padding: '10px 20px',
-                borderRadius: 8,
-                fontSize: 13,
-                fontWeight: 700,
-                textTransform: 'uppercase' as const,
-                textDecoration: 'none',
-                letterSpacing: '0.04em',
-                transition: 'background 0.2s, transform 0.15s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = '#4FD080'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = '#3DBE6B'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              Join Beta
-            </a>
+            <DownloadButton variant="primary" label="Get the app" size="sm" />
           </div>
 
           {/* Mobile right side */}
           <div className="flex md:hidden" style={{ alignItems: 'center', gap: 12 }}>
-            <a
-              href="#beta"
-              style={{
-                background: '#3DBE6B',
-                color: '#000',
-                padding: '8px 14px',
-                borderRadius: 8,
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase' as const,
-                textDecoration: 'none',
-              }}
-            >
-              Join Beta
-            </a>
+            <DownloadButton variant="primary" label="Get the app" size="sm" />
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}

@@ -105,12 +105,12 @@ export default function BetaSignup() {
 
   if (status === 'success') {
     return (
-      <section id="beta" style={{ background: '#090909', padding: '100px 24px', borderTop: '1px solid #181818' }}>
+      <section id="notify" style={{ background: '#090909', padding: '100px 24px', borderTop: '1px solid #181818' }}>
         <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
           <div style={{
             width: 80, height: 80, borderRadius: '50%',
-            background: 'rgba(61,190,107,0.1)',
-            border: '2px solid rgba(61,190,107,0.3)',
+            background: 'rgba(34,197,94,0.1)',
+            border: '2px solid rgba(34,197,94,0.3)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 28px', fontSize: 32,
           }}>
@@ -121,15 +121,15 @@ export default function BetaSignup() {
             style={{
               fontSize: 'clamp(48px, 6vw, 72px)',
               lineHeight: 1,
-              color: '#3DBE6B',
+              color: '#22c55e',
               letterSpacing: '0.02em',
               marginBottom: 12,
             }}
           >
-            YOU&apos;RE IN.
+            YOU&apos;RE ON THE LIST.
           </h2>
           <p style={{ color: '#888', fontSize: 17, marginBottom: 32 }}>
-            We&apos;ll be in touch soon with your beta access details.
+            We&apos;ll email you the moment CourtOS is live on the App Store.
           </p>
           <button
             onClick={handleShare}
@@ -144,8 +144,8 @@ export default function BetaSignup() {
               transition: 'all 0.2s',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#3DBE6B'
-              e.currentTarget.style.color = '#3DBE6B'
+              e.currentTarget.style.borderColor = '#22c55e'
+              e.currentTarget.style.color = '#22c55e'
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = '#2a2a2a'
@@ -160,18 +160,18 @@ export default function BetaSignup() {
   }
 
   return (
-    <section id="beta" style={{ background: '#090909', padding: '100px 24px', borderTop: '1px solid #181818' }}>
+    <section id="notify" style={{ background: '#090909', padding: '100px 24px', borderTop: '1px solid #181818' }}>
       <div style={{ maxWidth: 640, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: 'rgba(61,190,107,0.08)',
-            border: '1px solid rgba(61,190,107,0.2)',
+            background: 'rgba(34,197,94,0.08)',
+            border: '1px solid rgba(34,197,94,0.2)',
             borderRadius: 100, padding: '6px 14px', marginBottom: 20,
           }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3DBE6B', display: 'inline-block' }} />
-            <span style={{ color: '#3DBE6B', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              Limited Beta Spots
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+            <span style={{ color: '#22c55e', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              Launching This Month
             </span>
           </div>
           <h2
@@ -184,11 +184,11 @@ export default function BetaSignup() {
               marginBottom: 16,
             }}
           >
-            JOIN THE BETA.
+            BE FIRST TO DOWNLOAD.
           </h2>
           <p style={{ color: '#888', fontSize: 16, maxWidth: 460, margin: '0 auto' }}>
-            We&apos;re inviting a small group of coaches to test CourtOS before launch.
-            Free to join. No credit card. Just real games.
+            CourtOS hits the App Store this month. Drop your email and we&apos;ll send you
+            the download link the moment it&apos;s live.
           </p>
         </div>
 
@@ -203,7 +203,7 @@ export default function BetaSignup() {
             {/* Name */}
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-                Name <span style={{ color: '#3DBE6B' }}>*</span>
+                Name <span style={{ color: '#22c55e' }}>*</span>
               </label>
               <input
                 name="name"
@@ -216,7 +216,7 @@ export default function BetaSignup() {
                   ...INPUT_BASE,
                   borderColor: errors.name ? '#ef4444' : '#2a2a2a',
                 }}
-                onFocus={e => (e.currentTarget.style.borderColor = errors.name ? '#ef4444' : '#3DBE6B')}
+                onFocus={e => (e.currentTarget.style.borderColor = errors.name ? '#ef4444' : '#22c55e')}
                 onBlur={e => (e.currentTarget.style.borderColor = errors.name ? '#ef4444' : '#2a2a2a')}
               />
               {errors.name && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{errors.name}</p>}
@@ -225,7 +225,7 @@ export default function BetaSignup() {
             {/* Email */}
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-                Email <span style={{ color: '#3DBE6B' }}>*</span>
+                Email <span style={{ color: '#22c55e' }}>*</span>
               </label>
               <input
                 name="email"
@@ -238,7 +238,7 @@ export default function BetaSignup() {
                   ...INPUT_BASE,
                   borderColor: errors.email ? '#ef4444' : '#2a2a2a',
                 }}
-                onFocus={e => (e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#3DBE6B')}
+                onFocus={e => (e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#22c55e')}
                 onBlur={e => (e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#2a2a2a')}
               />
               {errors.email && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{errors.email}</p>}
@@ -247,7 +247,7 @@ export default function BetaSignup() {
             {/* Role selector */}
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-                I am a... <span style={{ color: '#3DBE6B' }}>*</span>
+                I am a... <span style={{ color: '#22c55e' }}>*</span>
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {ROLES.map(role => {
@@ -265,9 +265,9 @@ export default function BetaSignup() {
                         textAlign: 'left',
                         cursor: 'pointer',
                         transition: 'all 0.15s',
-                        background: selected ? 'rgba(61,190,107,0.12)' : '#1a1a1a',
-                        border: `1px solid ${selected ? '#3DBE6B' : '#2a2a2a'}`,
-                        color: selected ? '#3DBE6B' : '#888',
+                        background: selected ? 'rgba(34,197,94,0.12)' : '#1a1a1a',
+                        border: `1px solid ${selected ? '#22c55e' : '#2a2a2a'}`,
+                        color: selected ? '#22c55e' : '#888',
                       }}
                     >
                       {role.label}
@@ -290,7 +290,7 @@ export default function BetaSignup() {
                 value={formData.organization}
                 onChange={handleChange}
                 style={INPUT_BASE}
-                onFocus={e => (e.currentTarget.style.borderColor = '#3DBE6B')}
+                onFocus={e => (e.currentTarget.style.borderColor = '#22c55e')}
                 onBlur={e => (e.currentTarget.style.borderColor = '#2a2a2a')}
               />
             </div>
@@ -307,7 +307,7 @@ export default function BetaSignup() {
                 value={formData.message}
                 onChange={handleChange}
                 style={{ ...INPUT_BASE, resize: 'none' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#3DBE6B')}
+                onFocus={e => (e.currentTarget.style.borderColor = '#22c55e')}
                 onBlur={e => (e.currentTarget.style.borderColor = '#2a2a2a')}
               />
             </div>
@@ -318,7 +318,7 @@ export default function BetaSignup() {
               disabled={status === 'submitting'}
               style={{
                 width: '100%',
-                background: '#3DBE6B',
+                background: '#22c55e',
                 color: '#000',
                 padding: '16px 0',
                 borderRadius: 8,
@@ -335,7 +335,7 @@ export default function BetaSignup() {
                 if (status !== 'submitting') e.currentTarget.style.background = '#4FD080'
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = '#3DBE6B'
+                e.currentTarget.style.background = '#22c55e'
               }}
             >
               {status === 'submitting' ? 'Submitting...' : 'Get Early Access →'}

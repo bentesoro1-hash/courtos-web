@@ -1,10 +1,10 @@
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
-import NoAssistantNeeded from '@/components/NoAssistantNeeded'
-import Agitation from '@/components/Agitation'
-import AppTease from '@/components/AppTease'
-import FeaturesSection from '@/components/FeaturesSection'
+import FeatureBands from '@/components/FeatureBands'
+import Levels from '@/components/Levels'
 import HowItWorks from '@/components/HowItWorks'
+import Testimonial from '@/components/Testimonial'
+import Pricing from '@/components/Pricing'
 import BetaSignup from '@/components/BetaSignup'
 import FinalCTA from '@/components/FinalCTA'
 import Footer from '@/components/Footer'
@@ -15,11 +15,11 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <NoAssistantNeeded />
-        <Agitation />
-        <AppTease />
-        <FeaturesSection />
+        <FeatureBands />
+        <Levels />
         <HowItWorks />
+        <Testimonial />
+        <Pricing />
         <BetaSignup />
         <FinalCTA />
       </main>
