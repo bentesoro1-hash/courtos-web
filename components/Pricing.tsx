@@ -19,6 +19,7 @@ const TIERS = [
       'Rotation analytics & auto-subs',
       'Unlimited matches, rosters & lineups',
       'AI match summary & practice plans',
+      'Export data (CSV & PDF)',
     ],
     featured: true,
   },
