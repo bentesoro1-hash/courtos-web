@@ -1,6 +1,5 @@
 'use client'
 import Image from 'next/image'
-import Link from 'next/link'
 
 export default function Footer() {
   return (
@@ -24,8 +23,8 @@ export default function Footer() {
           />
         </a>
 
-        <div style={{ display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
-          {[['#how-it-works', 'Features'], ['#pricing', 'Pricing'], ['#notify', 'Get the app']].map(([href, label]) => (
+        <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
+          {[['#features', 'Features'], ['#how-it-works', 'How It Works'], ['#beta', 'Beta']].map(([href, label]) => (
             <a
               key={href}
               href={href}
@@ -35,17 +34,6 @@ export default function Footer() {
             >
               {label}
             </a>
-          ))}
-          {[['/privacy', 'Privacy'], ['/terms', 'Terms'], ['/subscription-terms', 'Subscriptions']].map(([href, label]) => (
-            <Link
-              key={href}
-              href={href}
-              style={{ color: '#444', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#888')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#444')}
-            >
-              {label}
-            </Link>
           ))}
         </div>
 
