@@ -1,5 +1,5 @@
 'use client'
-import PhoneMockup from './PhoneMockup'
+import HeroPhone from './HeroPhone'
 
 export default function Hero() {
   return (
@@ -144,9 +144,9 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right: phone mockup */}
+          {/* Right: real app screenshots */}
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <PhoneMockup />
+            <HeroPhone />
           </div>
         </div>
       </div>
