@@ -41,7 +41,7 @@ export default function Navbar() {
             <Image
               src="/logo.png"
               alt="CourtOS"
-              width={120}
+              width={158}
               height={28}
               priority
               style={{ height: 28, width: 'auto' }}

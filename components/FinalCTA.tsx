@@ -16,7 +16,7 @@ export default function FinalCTA() {
         <Image
           src="/logo.png"
           alt="CourtOS"
-          width={160}
+          width={226}
           height={40}
           style={{ height: 40, width: 'auto', margin: '0 auto 48px', display: 'block' }}
         />

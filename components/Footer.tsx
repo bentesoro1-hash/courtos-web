@@ -17,7 +17,7 @@ export default function Footer() {
           <Image
             src="/logo.png"
             alt="CourtOS"
-            width={88}
+            width={125}
             height={22}
             style={{ height: 22, width: 'auto' }}
           />

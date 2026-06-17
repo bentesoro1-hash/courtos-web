@@ -31,7 +31,7 @@ export default function LegalShell({
       >
         <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link href="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
-            <Image src="/logo.png" alt="CourtOS" width={104} height={26} style={{ height: 26, width: 'auto' }} priority />
+            <Image src="/logo.png" alt="CourtOS" width={147} height={26} style={{ height: 26, width: 'auto' }} priority />
           </Link>
           <Link href="/" style={{ color: '#22c55e', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
             ← Back to site
