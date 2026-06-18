@@ -48,8 +48,8 @@ export default function LegalShell({
         <hr style={{ border: 0, borderTop: '1px solid #1e293b', margin: '56px 0 24px' }} />
         <p style={{ color: '#475569', fontSize: 13, lineHeight: 1.6 }}>
           Questions about this document? Email{' '}
-          <a href="mailto:courtos@courtos.co" style={{ color: '#22c55e', textDecoration: 'none' }}>
-            courtos@courtos.co
+          <a href="mailto:support@courtos.co" style={{ color: '#22c55e', textDecoration: 'none' }}>
+            support@courtos.co
           </a>
           .
         </p>

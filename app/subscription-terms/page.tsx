@@ -100,7 +100,7 @@ export default function SubscriptionTermsPage() {
 
       <h2>Contact</h2>
       <p>
-        Questions about billing? Email <a href="mailto:courtos@courtos.co">courtos@courtos.co</a>.
+        Questions about billing? Email <a href="mailto:support@courtos.co">support@courtos.co</a>.
       </p>
     </LegalShell>
   )

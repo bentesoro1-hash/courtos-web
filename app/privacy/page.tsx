@@ -16,12 +16,12 @@ export default function PrivacyPage() {
           information needed to run your account and track your matches, rosters, and stats. We do not sell your
           data or your athletes&rsquo; data. Player roster entries may include youth athletes&rsquo; information —
           we treat that data carefully and only use it to provide coaching features. You can request deletion at
-          any time at <a href="mailto:courtos@courtos.co">courtos@courtos.co</a>.
+          any time at <a href="mailto:support@courtos.co">support@courtos.co</a>.
         </p>
       </div>
 
       <p>
-        This Privacy Policy explains how <strong>[LLC LEGAL NAME], a [STATE] limited liability company</strong>{' '}
+        This Privacy Policy explains how <strong>CourtOS LLC, a California limited liability company</strong>{' '}
         (&ldquo;CourtOS,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) collects, uses, and
         shares information in connection with the CourtOS mobile application and the website at courtos.co
         (together, the &ldquo;Service&rdquo;). By using the Service, you agree to this Policy.
@@ -129,7 +129,7 @@ export default function PrivacyPage() {
       <p>
         If a parent, guardian, or coach believes a child under 13 has created an account or that we hold a
         child&rsquo;s information without appropriate authorization, contact{' '}
-        <a href="mailto:courtos@courtos.co">courtos@courtos.co</a> and we will delete it promptly. Parents and
+        <a href="mailto:support@courtos.co">support@courtos.co</a> and we will delete it promptly. Parents and
         guardians may request access to, correction of, or deletion of their child&rsquo;s information through
         the same address.
       </p>
@@ -156,7 +156,7 @@ export default function PrivacyPage() {
         U.S. states have rights under applicable privacy laws, including the right not to be discriminated
         against for exercising them; we do not sell or &ldquo;share&rdquo; personal information for cross-context
         behavioral advertising. To exercise any right, email{' '}
-        <a href="mailto:courtos@courtos.co">courtos@courtos.co</a>. You can also manage subscriptions and many
+        <a href="mailto:support@courtos.co">support@courtos.co</a>. You can also manage subscriptions and many
         data items directly in the app or your app store account.
       </p>
 
@@ -176,9 +176,9 @@ export default function PrivacyPage() {
 
       <h2>12. Contact us</h2>
       <p>
-        [LLC LEGAL NAME]
+        CourtOS LLC
         <br />
-        Email: <a href="mailto:courtos@courtos.co">courtos@courtos.co</a>
+        Email: <a href="mailto:support@courtos.co">support@courtos.co</a>
       </p>
     </LegalShell>
   )

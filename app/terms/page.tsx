@@ -12,7 +12,7 @@ export default function TermsPage() {
     <LegalShell title="Terms of Service" effectiveDate="June 14, 2026">
       <p>
         These Terms of Service (&ldquo;Terms&rdquo;) are a legal agreement between you and{' '}
-        <strong>[LLC LEGAL NAME], a [STATE] limited liability company</strong> (&ldquo;CourtOS,&rdquo;
+        <strong>CourtOS LLC, a California limited liability company</strong> (&ldquo;CourtOS,&rdquo;
         &ldquo;we,&rdquo; &ldquo;us&rdquo;), governing your use of the CourtOS mobile application and the website
         at courtos.co (together, the &ldquo;Service&rdquo;). By creating an account or using the Service, you
         agree to these Terms and to our{' '}
@@ -29,7 +29,7 @@ export default function TermsPage() {
       <h2>2. Your account</h2>
       <p>
         You are responsible for your account credentials and for activity under your account. Keep your login
-        secure and notify us at <a href="mailto:courtos@courtos.co">courtos@courtos.co</a> if you suspect
+        secure and notify us at <a href="mailto:support@courtos.co">support@courtos.co</a> if you suspect
         unauthorized use. We may suspend or terminate accounts that violate these Terms.
       </p>
 
@@ -119,8 +119,8 @@ export default function TermsPage() {
 
       <h2>13. Governing law</h2>
       <p>
-        These Terms are governed by the laws of the State of [STATE], without regard to its conflict-of-laws
-        rules. You agree that any dispute will be resolved in the state or federal courts located in [STATE],
+        These Terms are governed by the laws of the State of California, without regard to its conflict-of-laws
+        rules. You agree that any dispute will be resolved in the state or federal courts located in California,
         except where applicable law gives you the right to bring a claim elsewhere.
       </p>
 
@@ -133,9 +133,9 @@ export default function TermsPage() {
 
       <h2>15. Contact</h2>
       <p>
-        [LLC LEGAL NAME]
+        CourtOS LLC
         <br />
-        Email: <a href="mailto:courtos@courtos.co">courtos@courtos.co</a>
+        Email: <a href="mailto:support@courtos.co">support@courtos.co</a>
       </p>
     </LegalShell>
   )
