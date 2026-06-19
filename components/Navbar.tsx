@@ -15,9 +15,10 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false)
 
   const NAV_LINKS = [
-    { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Beta', href: '#beta' },
+    { label: 'Features', href: '/#features' },
+    { label: 'How It Works', href: '/#how-it-works' },
+    { label: 'Academy', href: '/blog' },
+    { label: 'Beta', href: '/#beta' },
   ]
 
   return (
