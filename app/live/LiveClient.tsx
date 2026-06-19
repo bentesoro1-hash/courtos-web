@@ -79,6 +79,57 @@ function posColor(short: string): string {
   return POS_COLORS[(short || '').toUpperCase()] ?? '#64748B'
 }
 
+// ─── Court formations (Base / Serve / Receive) ────────────────────────────────
+// Tactical coordinates lifted from the app's src/constants/tacticalPositions.ts
+// (frame: x 0=left..1=right, y 0=net..1=baseline). Arrays are pos 1..6 for R1..R6.
+// court[] from the snapshot already gives the current on-court player per position
+// (rotation + libero swap applied by the app), so we can place the *current*
+// rotation in any formation without extra data.
+type CourtFmt = 'base' | 'serve' | 'receive'
+const BASE_COORDS: [number, number][] =[[0.88, 0.78], [0.88, 0.09], [0.5, 0.09], [0.12, 0.09], [0.12, 0.78], [0.5, 0.78]]
+const FORM_COORDS: Record<string, { receive: [number, number][][]; serve: [number, number][][] }> = {
+  '5-1': {
+    receive: [[[0.92,0.73],[0.83,0.62],[0.27,0.24],[0.08,0.33],[0.25,0.67],[0.54,0.73]],[[0.8,0.75],[0.92,0.5],[0.84,0.23],[0.17,0.73],[0.46,0.78],[0.71,0.27]],[[0.75,0.77],[0.91,0.31],[0.18,0.75],[0.08,0.19],[0.24,0.28],[0.54,0.75]],[[0.91,0.81],[0.24,0.74],[0.12,0.43],[0.07,0.18],[0.51,0.78],[0.75,0.74]],[[0.83,0.67],[0.92,0.45],[0.64,0.18],[0.19,0.68],[0.49,0.74],[0.63,0.8]],[[0.78,0.67],[0.64,0.19],[0.21,0.69],[0.08,0.2],[0.3,0.79],[0.52,0.68]]],
+    serve: [[[0.86,0.93],[0.58,0.26],[0.5,0.19],[0.39,0.26],[0.12,0.54],[0.5,0.83]],[[0.85,0.92],[0.53,0.19],[0.43,0.25],[0.32,0.18],[0.51,0.81],[0.85,0.56]],[[0.85,0.92],[0.71,0.19],[0.59,0.22],[0.5,0.2],[0.44,0.63],[0.56,0.59]],[[0.85,0.92],[0.62,0.2],[0.51,0.17],[0.41,0.22],[0.14,0.6],[0.51,0.82]],[[0.85,0.92],[0.5,0.2],[0.39,0.22],[0.3,0.19],[0.49,0.81],[0.83,0.56]],[[0.85,0.92],[0.7,0.17],[0.59,0.2],[0.5,0.17],[0.45,0.63],[0.56,0.58]]],
+  },
+  '6-2': {
+    receive: [[[0.87,0.83],[0.79,0.76],[0.49,0.19],[0.14,0.19],[0.17,0.76],[0.5,0.8]],[[0.76,0.78],[0.9,0.43],[0.72,0.18],[0.16,0.63],[0.44,0.78],[0.59,0.27]],[[0.8,0.76],[0.84,0.19],[0.15,0.71],[0.11,0.19],[0.32,0.25],[0.49,0.74]],[[0.85,0.85],[0.77,0.77],[0.49,0.19],[0.14,0.19],[0.16,0.76],[0.49,0.8]],[[0.77,0.77],[0.88,0.53],[0.68,0.11],[0.16,0.76],[0.46,0.86],[0.72,0.32]],[[0.78,0.76],[0.88,0.18],[0.16,0.7],[0.11,0.19],[0.26,0.34],[0.49,0.79]]],
+    serve: [[[0.86,0.93],[0.64,0.25],[0.52,0.15],[0.35,0.2],[0.11,0.56],[0.52,0.77]],[[0.86,0.93],[0.53,0.17],[0.4,0.19],[0.13,0.18],[0.48,0.78],[0.84,0.52]],[[0.86,0.93],[0.79,0.16],[0.64,0.16],[0.52,0.16],[0.17,0.51],[0.33,0.77]],[[0.86,0.93],[0.67,0.21],[0.54,0.16],[0.4,0.19],[0.29,0.7],[0.66,0.69]],[[0.86,0.93],[0.54,0.13],[0.4,0.17],[0.17,0.16],[0.47,0.79],[0.81,0.54]],[[0.86,0.93],[0.8,0.13],[0.65,0.17],[0.52,0.16],[0.21,0.51],[0.33,0.76]]],
+  },
+  '4-2': {
+    receive: [[[0.83,0.74],[0.72,0.16],[0.44,0.3],[0.31,0.16],[0.19,0.74],[0.51,0.74]],[[0.8,0.74],[0.63,0.16],[0.5,0.32],[0.38,0.16],[0.19,0.74],[0.51,0.74]],[[0.81,0.74],[0.51,0.32],[0.39,0.16],[0.08,0.32],[0.2,0.74],[0.5,0.74]],[[0.84,0.74],[0.72,0.16],[0.46,0.31],[0.32,0.16],[0.21,0.74],[0.51,0.74]],[[0.78,0.74],[0.63,0.16],[0.5,0.32],[0.37,0.16],[0.21,0.74],[0.49,0.74]],[[0.84,0.74],[0.51,0.32],[0.39,0.15],[0.09,0.32],[0.18,0.74],[0.51,0.74]]],
+    serve: [[[0.85,0.92],[0.76,0.15],[0.5,0.26],[0.4,0.15],[0.15,0.74],[0.51,0.74]],[[0.86,0.9],[0.65,0.18],[0.52,0.22],[0.38,0.18],[0.2,0.73],[0.52,0.73]],[[0.85,0.91],[0.56,0.17],[0.42,0.22],[0.09,0.19],[0.14,0.73],[0.52,0.73]],[[0.85,0.91],[0.82,0.16],[0.55,0.23],[0.42,0.17],[0.14,0.74],[0.52,0.73]],[[0.85,0.91],[0.67,0.18],[0.52,0.22],[0.39,0.24],[0.16,0.73],[0.51,0.73]],[[0.85,0.91],[0.56,0.17],[0.42,0.22],[0.09,0.19],[0.14,0.73],[0.52,0.73]]],
+  },
+}
+function coordFor(system: string, fmt: CourtFmt, rotation: number, pos: number): { x: number; y: number } {
+  const sys = FORM_COORDS[system] ? system : '5-1'
+  const r = Math.min(6, Math.max(1, rotation || 1))
+  const a = fmt === 'base' ? BASE_COORDS[pos - 1] : FORM_COORDS[sys][fmt][r - 1][pos - 1]
+  return { x: a[0], y: a[1] }
+}
+
+// Current scoring run, derived from recentPlays (newest first).
+function computeRun(plays: LiveRecentPlay[] | undefined): { us: boolean; len: number } {
+  if (!plays || plays.length === 0) return { us: true, len: 0 }
+  const first = plays[0]
+  let len = 0
+  for (const p of plays) { if (p.us === first.us) len++; else break }
+  return { us: first.us, len }
+}
+
+// Auto-written "match story" lines from team + player tallies.
+function buildStory(players: LivePlayerLine[], run: { us: boolean; len: number }, teamName: string, oppName: string): { emoji: string; text: string }[] {
+  const out: { emoji: string; text: string }[] = []
+  if (run.len >= 3) out.push({ emoji: run.us ? '🔥' : '⚠️', text: `${run.us ? teamName : oppName} on a ${run.len}-0 run.` })
+  const topK = [...players].sort((a, b) => b.kills - a.kills)[0]
+  if (topK && topK.kills > 0) out.push({ emoji: '⚡', text: `${topK.name} leads with ${topK.kills} kill${topK.kills > 1 ? 's' : ''}.` })
+  const passers = players.filter((p) => p.passRating != null).sort((a, b) => (b.passRating ?? 0) - (a.passRating ?? 0))
+  if (passers[0] && (passers[0].passRating ?? 0) > 0) out.push({ emoji: '🎯', text: `Serve-receive steady — ${passers[0].name} passing ${(passers[0].passRating ?? 0).toFixed(1)} of 3.0.` })
+  const acer = players.find((p) => p.aces > 0)
+  if (acer) out.push({ emoji: '🏐', text: `${acer.name} has ${acer.aces} ace${acer.aces > 1 ? 's' : ''} from the line.` })
+  return out.slice(0, 3)
+}
+
 interface LiveMatch {
   id: string
   room_code: string
@@ -159,8 +210,26 @@ export default function LiveClient() {
   const [now, setNow] = useState<Date>(() => new Date())
   const [activeCode, setActiveCode] = useState('')
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null)
+  const [myJersey, setMyJersey] = useState<number | null>(null)
+  const [fmt, setFmt] = useState<CourtFmt>('receive')
+  const [fmtManual, setFmtManual] = useState(false)
 
   const channelRef = useRef<any>(null)
+
+  // Persist the parent's followed player across visits.
+  useEffect(() => {
+    try {
+      const v = window.localStorage.getItem('courtos.live.myJersey')
+      if (v != null) setMyJersey(Number(v))
+    } catch {}
+  }, [])
+  const followPlayer = useCallback((jersey: number | null) => {
+    setMyJersey(jersey)
+    try {
+      if (jersey == null) window.localStorage.removeItem('courtos.live.myJersey')
+      else window.localStorage.setItem('courtos.live.myJersey', String(jersey))
+    } catch {}
+  }, [])
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000)
@@ -360,6 +429,13 @@ export default function LiveClient() {
     const homeName = matchData.team_name.slice(0, 13)
     const awayName = matchData.opponent_name.slice(0, 13)
 
+    const snap = matchData.stats_snapshot
+    const run = computeRun(snap?.recentPlays)
+    const system = FORM_COORDS[matchData.court_mode] ? matchData.court_mode : '5-1'
+    const fmtEff: CourtFmt = fmtManual ? fmt : (servingUs ? 'serve' : 'receive')
+    const myPlayer = myJersey != null ? snap?.players.find((p) => p.jersey === myJersey) ?? null : null
+    const story = snap ? buildStory(snap.players, run, homeName, awayName) : []
+
     return (
       <div
         className="flex flex-col"
@@ -492,25 +568,30 @@ export default function LiveClient() {
             </div>
           </div>
 
-          {/* Serving bar */}
-          <div
-            className="flex items-center"
-            style={{
-              backgroundColor: 'rgba(0,0,0,0.4)',
-              borderTop: '1px solid rgba(255,255,255,0.05)',
-              padding: '6px 14px',
-              minHeight: '32px',
-            }}
-          >
-            {servingUs ? (
-              <div className="flex items-center gap-1.5">
-                <span style={{ fontSize: '8px', color: '#22c55e' }}>●</span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>SERVING</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 ml-auto">
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>OPP SERVING 🏐</span>
-              </div>
+          {/* Serving + momentum bar */}
+          <div style={{ backgroundColor: 'rgba(0,0,0,0.4)', borderTop: '1px solid rgba(255,255,255,0.05)', padding: '8px 14px 10px' }}>
+            <div className="flex items-center" style={{ minHeight: '18px' }}>
+              {servingUs ? (
+                <div className="flex items-center gap-1.5">
+                  <span style={{ fontSize: '8px', color: '#22c55e' }}>●</span>
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>SERVING</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 ml-auto">
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>OPP SERVING 🏐</span>
+                </div>
+              )}
+            </div>
+            {run.len > 0 && (
+              <>
+                <div style={{ height: '6px', borderRadius: '999px', backgroundColor: '#13203a', overflow: 'hidden', marginTop: '7px' }}>
+                  <div style={{ width: `${Math.max(8, Math.min(92, run.us ? 50 + Math.min(run.len, 8) * 6 : 50 - Math.min(run.len, 8) * 6))}%`, height: '100%', background: run.us ? 'linear-gradient(90deg,#22c55e,#4ade80)' : 'linear-gradient(90deg,#f87171,#ef4444)', transition: 'width 0.6s' }} />
+                </div>
+                <div className="flex items-center justify-between" style={{ marginTop: '6px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: run.us ? '#22c55e' : '#ef4444' }}>{run.us ? '🔥' : '⚠️'} {run.len}-0 run</span>
+                  <span style={{ fontSize: '10px', color: '#475569' }}>momentum</span>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -540,46 +621,115 @@ export default function LiveClient() {
           </div>
         </div>
 
-        {/* ── Live court — role-colored rotation ── */}
-        {matchData.stats_snapshot?.court && matchData.stats_snapshot.court.length > 0 && (() => {
-          const byPos: Record<number, LiveCourtSlot> = {}
-          for (const s of matchData.stats_snapshot.court) byPos[s.pos] = s
-          const tok = (pos: number) => {
-            const s = byPos[pos]
-            if (!s) return <div key={pos} />
-            const c = posColor(s.position)
-            return (
-              <div key={pos} className="flex flex-col items-center" style={{ gap: '5px' }}>
-                <div
-                  className={BARLOW}
-                  style={{
-                    width: '52px', height: '52px', borderRadius: '999px',
-                    border: `2px solid ${c}`, backgroundColor: '#0b1120',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '21px', fontWeight: 900, color: '#f8fafc',
-                    boxShadow: `0 0 14px ${c}40`,
-                  }}
-                >
-                  {s.jersey}
+        {/* ── Your Player ── */}
+        {snap && snap.players.length > 0 && (
+          myPlayer ? (() => {
+            const c = posColor(myPlayer.position)
+            const atk = myPlayer.hittingPct == null ? 0 : Math.max(0, Math.min(1, (myPlayer.hittingPct + 0.2) / 0.7))
+            const pass = myPlayer.passRating == null ? 0 : myPlayer.passRating / 3
+            const ring = (label: string, frac: number, col: string, center: string) => {
+              const R = 20, CC = 2 * Math.PI * R, off = CC * (1 - Math.max(0, Math.min(1, frac)))
+              return (
+                <div className="flex flex-col items-center" style={{ gap: '5px' }} key={label}>
+                  <div style={{ position: 'relative', width: '52px', height: '52px' }}>
+                    <svg width="52" height="52" style={{ transform: 'rotate(-90deg)' }}>
+                      <circle cx="26" cy="26" r={R} fill="none" stroke="#13203a" strokeWidth="6" />
+                      <circle cx="26" cy="26" r={R} fill="none" stroke={col} strokeWidth="6" strokeLinecap="round" strokeDasharray={CC} strokeDashoffset={off} />
+                    </svg>
+                    <div className={BARLOW} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 900, color: col }}>{center}</div>
+                  </div>
+                  <span style={{ fontSize: '8px', color: '#64748b', textTransform: 'uppercase' }}>{label}</span>
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', lineHeight: 1 }}>{s.name}</div>
-                <div style={{ fontSize: '8px', fontWeight: 700, color: c, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {s.position}
+              )
+            }
+            return (
+              <div className="mx-4 mt-3 rounded-xl" style={{ background: 'linear-gradient(155deg,#10243a,#0d1526 60%)', border: `1.5px solid ${c}`, padding: '14px' }}>
+                <div className="flex items-center" style={{ gap: '12px' }}>
+                  <div className={BARLOW} style={{ width: '52px', height: '52px', borderRadius: '999px', border: `2.5px solid ${c}`, backgroundColor: '#0b1120', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', fontWeight: 900, color: '#f8fafc', boxShadow: `0 0 16px ${c}55` }}>{myPlayer.jersey}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className={BARLOW} style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>{myPlayer.name}</div>
+                    <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '3px' }}>#{myPlayer.jersey} · <span style={{ color: c, fontWeight: 700 }}>{myPlayer.position}</span> · {myPlayer.points} pts</div>
+                  </div>
+                  <button onClick={() => followPlayer(null)} style={{ fontSize: '10px', color: '#64748b', background: 'transparent', border: '1px solid #1e293b', borderRadius: '999px', padding: '4px 10px', cursor: 'pointer' }}>Unfollow</button>
+                </div>
+                <div className="flex" style={{ justifyContent: 'space-between', marginTop: '14px' }}>
+                  {ring('Attack', atk, '#22c55e', myPlayer.hittingPct == null ? '—' : pctLabel(myPlayer.hittingPct))}
+                  {ring('Serve', Math.min(1, myPlayer.aces * 0.4 + (myPlayer.serviceErrors ? 0.25 : 0.55)), '#eab308', String(myPlayer.aces))}
+                  {ring('Pass', pass, '#8b5cf6', ratingLabel(myPlayer.passRating))}
+                  {ring('Defense', Math.min(1, myPlayer.digs * 0.18 + myPlayer.blocks * 0.25 + 0.1), '#14b8a6', String(myPlayer.digs + myPlayer.blocks))}
                 </div>
               </div>
             )
-          }
+          })() : (
+            <div className="mx-4 mt-3 rounded-xl" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '14px', textAlign: 'center' }}>
+              <span style={{ fontSize: '13px', color: '#94a3b8' }}>⭐ Follow your player — tap the ☆ on any player below to pin them here all match.</span>
+            </div>
+          )
+        )}
+
+        {/* ── Match Story ── */}
+        {story.length > 0 && (
+          <div className="mx-4 mt-3" style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+            {story.map((st, i) => (
+              <div key={i} className="flex items-center rounded-xl" style={{ gap: '10px', backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '10px 12px' }}>
+                <span style={{ fontSize: '15px' }}>{st.emoji}</span>
+                <span style={{ fontSize: '13px', color: '#e2e8f0' }}>{st.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── On Court — Base / Serve / Receive ── */}
+        {snap?.court && snap.court.length > 0 && (() => {
+          const byPos: Record<number, LiveCourtSlot> = {}
+          for (const s of snap.court) byPos[s.pos] = s
+          const X = (x: number) => `${6 + x * 88}%`
+          const Y = (y: number) => `${8 + y * 84}%`
           return (
-            <div className="mx-4 mt-3 rounded-xl" style={{ backgroundColor: '#070d1a', border: '1px solid #1e293b', padding: '16px 14px' }}>
-              <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', textAlign: 'center' }}>
-                On Court · {matchData.court_mode || '5-1'}
+            <div className="mx-4 mt-3 rounded-xl" style={{ backgroundColor: '#070d1a', border: '1px solid #1e293b', padding: '12px' }}>
+              <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
+                <span style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>On Court</span>
+                <span className={BARLOW} style={{ fontSize: '11px', fontWeight: 800, color: '#eab308', backgroundColor: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.35)', borderRadius: '999px', padding: '2px 9px' }}>{system}</span>
               </div>
-              <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, #f59e0b, transparent)', margin: '0 4px 16px' }} />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
-                {tok(4)}{tok(3)}{tok(2)}
+              <div className="flex" style={{ gap: '5px', marginBottom: '8px' }}>
+                {(['base', 'serve', 'receive'] as CourtFmt[]).map((f) => {
+                  const on = fmtEff === f
+                  return (
+                    <button key={f} onClick={() => { setFmt(f); setFmtManual(true) }} className={BARLOW}
+                      style={{ flex: 1, fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', padding: '7px 0', borderRadius: '8px', cursor: 'pointer', color: on ? '#04130a' : '#64748b', background: on ? '#22c55e' : '#0b1322', border: `1px solid ${on ? '#22c55e' : '#1e293b'}` }}>
+                      {f}
+                    </button>
+                  )
+                })}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-                {tok(5)}{tok(6)}{tok(1)}
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '7 / 8', background: 'radial-gradient(120% 80% at 50% 38%,#11253e,#0a1120)', borderRadius: '12px', border: '1px solid #1e293b', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', left: '6%', right: '6%', top: '8%', height: '4px', background: 'linear-gradient(90deg,transparent,#fbbf24,#fbbf24,transparent)', borderRadius: '2px' }} />
+                <div style={{ position: 'absolute', left: '6%', right: '6%', top: '36%', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                <div style={{ position: 'absolute', left: '6%', right: '6%', top: '92%', height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+                {[1, 2, 3, 4, 5, 6].map((pos) => {
+                  const s = byPos[pos]
+                  if (!s) return null
+                  const c = posColor(s.position)
+                  const cc = coordFor(system, fmtEff, matchData.current_rotation, pos)
+                  const serving = fmtEff === 'serve' && pos === 1
+                  const mine = myJersey === s.jersey
+                  return (
+                    <div key={pos} style={{ position: 'absolute', left: X(cc.x), top: Y(cc.y), transform: 'translate(-50%,-50%)', transition: 'left 0.6s cubic-bezier(.34,1.2,.5,1), top 0.6s cubic-bezier(.34,1.2,.5,1)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div style={{ fontSize: '8px', fontWeight: 800, color: c, border: `1px solid ${c}66`, background: '#0b1120', borderRadius: '999px', padding: '1px 6px', marginBottom: '-7px', zIndex: 3, position: 'relative' }}>{s.position}</div>
+                      <div className={BARLOW} style={{ width: '46px', height: '46px', borderRadius: '999px', border: `2.5px solid ${c}`, backgroundColor: '#0b1120', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: serving ? '0 0 0 3px rgba(234,179,8,0.55), 0 0 18px rgba(234,179,8,0.5)' : mine ? '0 0 0 3px rgba(34,197,94,0.45), 0 0 16px rgba(34,197,94,0.5)' : `0 0 12px ${c}55` }}>
+                        <span style={{ fontSize: '18px', fontWeight: 900, color: '#fff', lineHeight: 1 }}>{s.jersey}</span>
+                        <span style={{ fontSize: '8px', fontWeight: 700, color: '#cbd5e1', lineHeight: 1, marginTop: '1px', maxWidth: '42px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
+                      </div>
+                      <div style={{ fontSize: '8px', fontWeight: 800, color: '#94a3b8', background: '#0b1322', border: '1px solid #1e293b', borderRadius: '6px', padding: '1px 5px', marginTop: '2px' }}>P{pos}</div>
+                    </div>
+                  )
+                })}
+              </div>
+              <div style={{ textAlign: 'center', fontSize: '10px', color: '#475569', marginTop: '9px', fontWeight: 600 }}>
+                {fmtEff === 'serve' ? 'Serving formation' : fmtEff === 'receive' ? 'Serve-receive' : 'Base positions'} · Rotation {matchData.current_rotation} · {system}
+                {fmtManual
+                  ? <button onClick={() => setFmtManual(false)} style={{ color: '#22c55e', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '10px', fontWeight: 700 }}> · ↺ live</button>
+                  : <span style={{ color: servingUs ? '#22c55e' : '#f59e0b' }}> · live</span>}
               </div>
             </div>
           )
@@ -714,7 +864,14 @@ export default function LiveClient() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center" style={{ gap: '14px' }}>
+                        <div className="flex items-center" style={{ gap: '12px' }}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); followPlayer(myJersey === p.jersey ? null : p.jersey) }}
+                            style={{ fontSize: '17px', background: 'transparent', border: 'none', cursor: 'pointer', lineHeight: 1, color: myJersey === p.jersey ? '#eab308' : '#475569' }}
+                            aria-label={myJersey === p.jersey ? 'Unfollow' : 'Follow'}
+                          >
+                            {myJersey === p.jersey ? '★' : '☆'}
+                          </button>
                           <div style={{ textAlign: 'right' }}>
                             <div className={BARLOW} style={{ fontSize: '18px', fontWeight: 900, color: c, lineHeight: 1 }}>
                               {p.points}
