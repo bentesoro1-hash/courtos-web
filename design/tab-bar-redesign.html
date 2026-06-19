@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#060b14"/>
+<title>CourtOS · Tab Bar — redesign options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#060b14;--card:#0f172a;--card2:#0b1120;--line:#1e293b;
+    --txt:#f8fafc;--txt2:#94a3b8;--txt3:#475569;--txt4:#334155;
+    --green:#22c55e;--blue:#3b82f6;--gold:#eab308;--red:#ef4444;
+    --head:"Barlow Condensed","Barlow",system-ui,sans-serif;--body:"Barlow",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:#05080f;color:var(--txt);display:flex;justify-content:center;padding:24px 0 60px;}
+  .wrap{width:100%;max-width:430px;padding:0 16px;}
+  .logo{font-family:var(--head);font-weight:900;font-size:19px;text-align:center;padding:4px 0 2px;}
+  .logo b{color:var(--txt);}.logo span{color:var(--green);}
+  .lede{font-size:12px;color:var(--txt2);text-align:center;line-height:1.5;margin:6px 10px 14px;}
+  .opt-h{display:flex;align-items:baseline;gap:8px;margin:28px 2px 4px;}
+  .opt-h .n{font-family:var(--head);font-weight:900;font-size:13px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;}
+  .opt-h .t{font-family:var(--head);font-weight:800;font-size:18px;}
+  .note{font-size:11.5px;color:var(--txt2);line-height:1.5;margin:0 2px 12px;}
+  .note b{color:var(--txt);font-weight:700;}
+  .stage{background:#0a0f1a;border:1px solid #11182a;border-radius:22px;padding:22px 14px 14px;position:relative;}
+  .stage .hint{position:absolute;top:8px;left:14px;font-size:9px;color:var(--txt4);text-transform:uppercase;letter-spacing:.1em;}
+
+  /* shared icon sizing */
+  svg{display:block;}
+  .lab{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.01em;}
+
+  /* ===== Option A — Soft Pill (floating) ===== */
+  .barA{display:flex;align-items:center;gap:4px;background:rgba(15,23,42,.9);border:1px solid #1b2740;border-radius:999px;padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+  .tabA{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:999px;transition:.2s;}
+  .tabA.on{background:var(--c-bg);}
+  .tabA .lab{color:var(--txt3);}
+  .tabA.on .lab{color:var(--c);font-weight:700;}
+
+  /* ===== Option B — Lifted Active ===== */
+  .barB{display:flex;align-items:flex-end;justify-content:space-around;background:rgba(10,15,26,.96);border-top:1px solid #16213a;border-radius:20px 20px 0 0;padding:10px 6px 12px;}
+  .tabB{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;}
+  .tabB .puck{width:46px;height:34px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:.2s;}
+  .tabB.on .puck{background:var(--c);box-shadow:0 6px 16px var(--c-sh);transform:translateY(-4px);}
+  .tabB .lab{color:var(--txt3);}
+  .tabB.on .lab{color:var(--c);font-weight:700;}
+
+  /* ===== Option C — Minimal Top-Accent ===== */
+  .barC{display:flex;align-items:stretch;background:#070d18;border-top:1px solid #16213a;}
+  .tabC{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px 14px;position:relative;}
+  .tabC .acc{position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:3px;border-radius:0 0 3px 3px;transition:width .2s;}
+  .tabC.on .acc{width:42px;background:var(--c);}
+  .tabC .lab{color:var(--txt3);}
+  .tabC.on .lab{color:var(--c);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><b>Court</b><span>OS</span></div>
+  <div class="lede">Bottom nav, three directions. Each tab owns an accent — <b style="color:#22c55e">Match green</b>, <b style="color:#eab308">Stats gold</b>, <b style="color:#3b82f6">Lineup blue</b>, <b style="color:#ef4444">More red</b> — so the active tab is unmistakable. (Active = Lineup.)</div>
+
+  <!-- OPTION A -->
+  <div class="opt-h"><span class="n">Option A</span><span class="t">Soft Pill</span></div>
+  <div class="note">Closest to today, just cleaner. Active tab gets a <b>soft accent-tinted pill</b> behind icon + label. Calm, familiar, premium. Lowest effort.</div>
+  <div class="stage"><span class="hint">floating</span>
+    <div class="barA" id="barA"></div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="opt-h"><span class="n">Option B</span><span class="t">Lifted Active</span></div>
+  <div class="note">Active icon <b>lifts into a filled accent puck</b> with a soft glow — playful and unmistakable, great for a sports app. The most "fun," still tasteful.</div>
+  <div class="stage"><span class="hint">docked</span>
+    <div class="barB" id="barB"></div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="opt-h"><span class="n">Option C</span><span class="t">Minimal Top-Accent</span></div>
+  <div class="note">Flat, docked bar with a small <b>accent underline</b> on the active tab + colored icon/label. The most Apple/Linear — quiet and modern. Best if you want the nav to disappear and the content to lead.</div>
+  <div class="stage"><span class="hint">docked · flat</span>
+    <div class="barC" id="barC"></div>
+  </div>
+
+  <div class="lede" style="margin-top:26px">My pick: <b style="color:#e2e8f0">Option B (Lifted Active)</b> — energetic and obvious for coaches glancing mid-match, while keeping the dark premium feel. A is the safe choice; C if you want it ultra-minimal.</div>
+</div>
+
+<script>
+  const TABS=[
+    {k:'match', label:'Match', c:'#22c55e'},
+    {k:'stats', label:'Stats', c:'#eab308'},
+    {k:'lineup',label:'Lineup',c:'#3b82f6'},
+    {k:'more',  label:'More',  c:'#ef4444'},
+  ];
+  const ACTIVE='lineup';
+  function icon(k,color,size){
+    const s=size||24, st=`stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+    if(k==='match') return `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" ${st}/><rect x="14" y="3" width="7" height="7" rx="1.5" ${st}/><rect x="3" y="14" width="7" height="7" rx="1.5" ${st}/><rect x="14" y="14" width="7" height="7" rx="1.5" ${st}/></svg>`;
+    if(k==='stats') return `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><line x1="4" y1="20" x2="4" y2="13" ${st}/><line x1="9" y1="20" x2="9" y2="9" ${st}/><line x1="14" y1="20" x2="14" y2="15" ${st}/><line x1="19" y1="20" x2="19" y2="5" ${st}/></svg>`;
+    if(k==='lineup') return `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><path d="M12 3 21 8 12 13 3 8 Z" ${st}/><path d="M3 13 12 18 21 13" ${st}/></svg>`;
+    return `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="${color}"/><circle cx="12" cy="12" r="1.6" fill="${color}"/><circle cx="19" cy="12" r="1.6" fill="${color}"/></svg>`;
+  }
+  // A
+  document.getElementById('barA').innerHTML=TABS.map(t=>{
+    const on=t.k===ACTIVE;const col=on?t.c:'#64748b';
+    return `<div class="tabA ${on?'on':''}" style="--c:${t.c};--c-bg:${t.c}1f">${icon(t.k,col,22)}<span class="lab">${t.label}</span></div>`;
+  }).join('');
+  // B
+  document.getElementById('barB').innerHTML=TABS.map(t=>{
+    const on=t.k===ACTIVE;const iconCol=on?'#04130a':'#64748b';
+    return `<div class="tabB ${on?'on':''}" style="--c:${t.c};--c-sh:${t.c}66"><div class="puck">${icon(t.k,iconCol,22)}</div><span class="lab">${t.label}</span></div>`;
+  }).join('');
+  // C
+  document.getElementById('barC').innerHTML=TABS.map(t=>{
+    const on=t.k===ACTIVE;const col=on?t.c:'#64748b';
+    return `<div class="tabC ${on?'on':''}" style="--c:${t.c}"><span class="acc"></span>${icon(t.k,col,23)}<span class="lab">${t.label}</span></div>`;
+  }).join('');
+</script>
+</body>
+</html>
