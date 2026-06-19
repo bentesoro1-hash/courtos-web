@@ -4,6 +4,50 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
+interface LivePlayerLine {
+  id: string
+  name: string
+  jersey: number
+  position: string
+  kills: number
+  hittingErrors: number
+  attackAttempts: number
+  hittingPct: number | null
+  aces: number
+  serviceErrors: number
+  serveInPlay: number
+  blocks: number
+  digs: number
+  passes: number
+  passRating: number | null
+  passErrors: number
+  points: number
+}
+
+interface LiveTeamLine {
+  pointsWon: number
+  pointsLost: number
+  kills: number
+  aces: number
+  blocks: number
+  oppErrors: number
+  serviceErrors: number
+  hittingErrors: number
+  passErrors: number
+  oppKills: number
+  digs: number
+  passes: number
+  passRating: number | null
+  attackAttempts: number
+  hittingPct: number | null
+}
+
+interface LiveStatsSnapshot {
+  updatedAt: string
+  team: LiveTeamLine
+  players: LivePlayerLine[]
+}
+
 interface LiveMatch {
   id: string
   room_code: string
@@ -19,6 +63,16 @@ interface LiveMatch {
   court_mode: string
   is_active: boolean
   last_updated: string | null
+  stats_snapshot: LiveStatsSnapshot | null
+}
+
+function pctLabel(p: number | null): string {
+  if (p == null) return '—'
+  return `${Math.round(p * 100)}%`
+}
+function ratingLabel(r: number | null): string {
+  if (r == null) return '—'
+  return r.toFixed(1)
 }
 
 type PageState = 'enter' | 'loading' | 'watching' | 'ended' | 'error'
@@ -59,6 +113,7 @@ export default function LiveClient() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [now, setNow] = useState<Date>(() => new Date())
   const [activeCode, setActiveCode] = useState('')
+  const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null)
 
   const channelRef = useRef<any>(null)
 
@@ -525,6 +580,159 @@ export default function LiveClient() {
                   {matchData.sets_lost}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Team stats ── */}
+        {matchData.stats_snapshot && (
+          <div
+            className="mx-4 mt-3 rounded-xl"
+            style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '14px 16px' }}
+          >
+            <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>
+              TEAM STATS
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+              {[
+                { label: 'Kills', value: matchData.stats_snapshot.team.kills },
+                { label: 'Aces', value: matchData.stats_snapshot.team.aces },
+                { label: 'Blocks', value: matchData.stats_snapshot.team.blocks },
+                { label: 'Hit %', value: pctLabel(matchData.stats_snapshot.team.hittingPct) },
+                { label: 'Digs', value: matchData.stats_snapshot.team.digs },
+                { label: 'Passes', value: matchData.stats_snapshot.team.passes },
+                { label: 'Pass Avg', value: ratingLabel(matchData.stats_snapshot.team.passRating) },
+                {
+                  label: 'Errors',
+                  value:
+                    matchData.stats_snapshot.team.serviceErrors +
+                    matchData.stats_snapshot.team.hittingErrors +
+                    matchData.stats_snapshot.team.passErrors,
+                },
+              ].map((s) => (
+                <div key={s.label} style={{ textAlign: 'center' }}>
+                  <div className={BARLOW} style={{ fontSize: '22px', fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>
+                    {s.value}
+                  </div>
+                  <div style={{ fontSize: '8px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px' }}>
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Players — tap to expand ── */}
+        {matchData.stats_snapshot && matchData.stats_snapshot.players.length > 0 && (
+          <div className="mx-4 mt-3 mb-2">
+            <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', paddingLeft: '4px' }}>
+              Players · tap for detail
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {[...matchData.stats_snapshot.players]
+                .sort((a, b) => b.points - a.points || a.jersey - b.jersey)
+                .map((p) => {
+                  const open = expandedPlayer === p.id
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => setExpandedPlayer(open ? null : p.id)}
+                      style={{
+                        backgroundColor: '#0f172a',
+                        border: `1px solid ${open ? '#22c55e' : '#1e293b'}`,
+                        borderRadius: '12px',
+                        padding: '12px 14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center" style={{ gap: '10px' }}>
+                          <div
+                            className={BARLOW}
+                            style={{
+                              width: '34px',
+                              height: '34px',
+                              borderRadius: '999px',
+                              border: '1.5px solid #22c55e',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '15px',
+                              fontWeight: 900,
+                              color: '#22c55e',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {p.jersey}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: 700, color: '#f8fafc' }}>{p.name}</div>
+                            <div style={{ fontSize: '10px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                              {p.position}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center" style={{ gap: '14px' }}>
+                          <div style={{ textAlign: 'right' }}>
+                            <div className={BARLOW} style={{ fontSize: '18px', fontWeight: 900, color: '#22c55e', lineHeight: 1 }}>
+                              {p.points}
+                            </div>
+                            <div style={{ fontSize: '8px', color: '#475569', textTransform: 'uppercase' }}>Pts</div>
+                          </div>
+                          <span
+                            style={{
+                              fontSize: '16px',
+                              color: '#475569',
+                              display: 'inline-block',
+                              transform: open ? 'rotate(90deg)' : 'none',
+                              transition: 'transform 0.15s',
+                            }}
+                          >
+                            ›
+                          </span>
+                        </div>
+                      </div>
+
+                      {open && (
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '12px',
+                            marginTop: '12px',
+                            paddingTop: '12px',
+                            borderTop: '1px solid #1e293b',
+                          }}
+                        >
+                          {[
+                            { label: 'Kills', value: p.kills },
+                            { label: 'Hit %', value: pctLabel(p.hittingPct) },
+                            { label: 'Attempts', value: p.attackAttempts },
+                            { label: 'Aces', value: p.aces },
+                            { label: 'Blocks', value: p.blocks },
+                            { label: 'Digs', value: p.digs },
+                            { label: 'Passes', value: p.passes },
+                            { label: 'Pass Avg', value: ratingLabel(p.passRating) },
+                            { label: 'Atk Err', value: p.hittingErrors },
+                            { label: 'Srv Err', value: p.serviceErrors },
+                            { label: 'Pass Err', value: p.passErrors },
+                            { label: 'Points', value: p.points },
+                          ].map((s) => (
+                            <div key={s.label} style={{ textAlign: 'center' }}>
+                              <div className={BARLOW} style={{ fontSize: '18px', fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>
+                                {s.value}
+                              </div>
+                              <div style={{ fontSize: '7px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '3px' }}>
+                                {s.label}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
             </div>
           </div>
         )}
