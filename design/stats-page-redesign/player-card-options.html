@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#060b14"/>
+<title>CourtOS · Player Card — redesign options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#060b14;--card:#0f172a;--card2:#0b1120;--line:#1e293b;--line2:#161f30;
+    --txt:#f8fafc;--txt2:#94a3b8;--txt3:#475569;--txt4:#334155;
+    --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--gold:#eab308;--purple:#8b5cf6;--teal:#14b8a6;--orange:#f97316;
+    --head:"Barlow Condensed","Barlow",system-ui,sans-serif;--body:"Barlow",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:#05080f;color:var(--txt);display:flex;justify-content:center;padding:20px 0 60px;}
+  .wrap{width:100%;max-width:430px;padding:0 14px;}
+  .barlow{font-family:var(--head);}
+  .logo{font-family:var(--head);font-weight:900;font-size:19px;text-align:center;padding:6px 0 4px;}
+  .logo b{color:var(--txt);} .logo span{color:var(--green);}
+  .lede{font-size:12px;color:var(--txt2);text-align:center;line-height:1.5;margin:6px 16px 18px;}
+  .opt-h{display:flex;align-items:baseline;gap:8px;margin:26px 2px 4px;}
+  .opt-h .n{font-family:var(--head);font-weight:900;font-size:13px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;}
+  .opt-h .t{font-family:var(--head);font-weight:800;font-size:18px;}
+  .opt-note{font-size:11.5px;color:var(--txt2);line-height:1.5;margin:0 2px 12px;}
+  .opt-note b{color:var(--txt);font-weight:700;}
+  .pos-oh{color:var(--green);} .ring-track{stroke:#13203a;}
+
+  /* shared bits */
+  .crest{font-family:var(--head);font-weight:900;color:#fff;}
+  .statuspill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:4px 10px;}
+  .statuspill .d{width:7px;height:7px;border-radius:999px;background:var(--green);}
+  .trend{font-size:10px;font-weight:800;color:var(--green);}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#e2e8f0;}
+
+  /* ============ OPTION A — Refined Hero Ring ============ */
+  .a-card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:16px;padding:15px;}
+  .a-top{display:flex;align-items:center;gap:11px;}
+  .a-disc{width:42px;height:42px;border-radius:999px;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:900;font-size:17px;color:var(--green);}
+  .a-name{font-family:var(--head);font-weight:900;font-size:19px;line-height:1;}
+  .a-pos{font-size:10px;font-weight:800;color:var(--green);border:1px solid var(--green);border-radius:5px;padding:1px 6px;display:inline-block;margin-top:4px;}
+  .a-body{display:flex;gap:14px;align-items:center;margin-top:13px;}
+  .a-ringbox{position:relative;width:84px;height:84px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .a-ringbox svg{width:84px;height:84px;transform:rotate(-90deg);}
+  .a-ringbox .cv{position:absolute;text-align:center;}
+  .a-ringbox .n{font-family:var(--head);font-weight:900;font-size:21px;line-height:1;}
+  .a-ringbox .u{font-size:8px;color:var(--txt3);text-transform:uppercase;}
+  .a-bars{flex:1;display:flex;flex-direction:column;gap:8px;}
+  .a-bar{display:flex;align-items:center;gap:8px;}
+  .a-bar .l{font-size:10px;color:var(--txt2);width:46px;text-transform:uppercase;letter-spacing:.04em;}
+  .a-bar .tr{flex:1;height:7px;border-radius:4px;background:#13203a;overflow:hidden;}
+  .a-bar .fl{height:100%;border-radius:4px;}
+  .a-bar .v{font-family:var(--head);font-weight:900;font-size:13px;width:40px;text-align:right;}
+  .a-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:11px;border-top:1px solid var(--line);}
+  .a-foot .ctx{font-size:11px;color:var(--txt3);}
+
+  /* ============ OPTION B — Signature Card ============ */
+  .b-card{border-radius:18px;padding:16px;position:relative;overflow:hidden;background:linear-gradient(150deg,#143524,#0c1626 55%);border:1px solid rgba(34,197,94,.4);}
+  .b-card::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:999px;background:radial-gradient(circle,rgba(34,197,94,.18),transparent 70%);}
+  .b-top{display:flex;align-items:center;gap:12px;position:relative;}
+  .b-crest{width:54px;height:54px;border-radius:14px;background:linear-gradient(160deg,var(--green),#15803d);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#04130a;box-shadow:0 6px 18px rgba(34,197,94,.35);}
+  .b-name{font-family:var(--head);font-weight:900;font-size:21px;line-height:1;}
+  .b-sub{font-size:11px;color:var(--txt2);margin-top:3px;}
+  .b-hero{display:flex;align-items:flex-end;gap:10px;margin-top:14px;position:relative;}
+  .b-hero .big{font-family:var(--head);font-weight:900;font-size:52px;line-height:.85;color:var(--green);}
+  .b-hero .biglbl{font-family:var(--head);font-weight:800;font-size:14px;color:#e2e8f0;text-transform:uppercase;letter-spacing:.04em;padding-bottom:6px;}
+  .b-hero .tr{margin-left:auto;font-size:11px;font-weight:800;color:var(--green);padding-bottom:6px;}
+  .b-strip{display:flex;gap:7px;margin-top:14px;position:relative;}
+  .b-chip{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;padding:8px 4px;text-align:center;}
+  .b-chip .v{font-family:var(--head);font-weight:900;font-size:17px;line-height:1;}
+  .b-chip .l{font-size:7.5px;color:var(--txt3);text-transform:uppercase;margin-top:4px;}
+  .b-badge{margin-top:13px;font-size:12px;color:#e2e8f0;display:flex;align-items:center;gap:7px;position:relative;}
+
+  /* ============ OPTION C — Radar Profile ============ */
+  .c-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;}
+  .c-top{display:flex;align-items:center;gap:11px;margin-bottom:6px;}
+  .c-disc{width:38px;height:38px;border-radius:999px;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:900;font-size:15px;color:var(--green);}
+  .c-body{display:flex;gap:6px;align-items:center;}
+  .c-radar{width:150px;height:150px;flex-shrink:0;}
+  .c-radar text{font-family:var(--body);}
+  .c-side{flex:1;display:flex;flex-direction:column;gap:9px;}
+  .c-kv{display:flex;align-items:baseline;justify-content:space-between;}
+  .c-kv .l{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.04em;}
+  .c-kv .v{font-family:var(--head);font-weight:900;font-size:18px;}
+  .c-badge{font-size:11.5px;color:#e2e8f0;margin-top:11px;padding-top:10px;border-top:1px solid var(--line);}
+
+  /* ============ OPTION D — Scannable Row ============ */
+  .d-list{display:flex;flex-direction:column;gap:7px;}
+  .d-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;}
+  .d-row.mine{border-color:var(--gold);}
+  .d-disc{width:38px;height:38px;border-radius:999px;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:900;font-size:15px;color:var(--green);flex-shrink:0;}
+  .d-mid{flex:1;min-width:0;}
+  .d-name{font-family:var(--head);font-weight:800;font-size:16px;line-height:1.05;}
+  .d-line{font-size:11px;color:var(--txt2);margin-top:2px;}
+  .d-line b{color:#e2e8f0;font-weight:700;}
+  .d-sig{text-align:right;}
+  .d-sig .v{font-family:var(--head);font-weight:900;font-size:22px;line-height:1;color:var(--green);}
+  .d-sig .l{font-size:8px;color:var(--txt3);text-transform:uppercase;}
+  .d-spark{display:flex;align-items:flex-end;gap:2px;height:24px;}
+  .d-spark i{width:4px;border-radius:2px;background:var(--green);opacity:.55;}
+  .d-chev{color:var(--txt3);font-size:18px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><b>Court</b><span>OS</span></div>
+  <div class="lede">Player stat card — four directions for the in-app PLAYERS tab. Same player, same data. Each uses a <b style="color:#e2e8f0">vs-own-average trend</b> (▲) instead of ranking, so it reads as growth, not a leaderboard.</div>
+
+  <!-- OPTION A -->
+  <div class="opt-h"><span class="n">Option A</span><span class="t">Refined Hero Ring</span></div>
+  <div class="opt-note">A cleaner version of <b>what you have</b> — one accent color, tighter spacing, a signature-stat callout, and a self-trend. Lowest effort, instantly familiar. <b>Best if</b> you want polish without changing the mental model.</div>
+  <div class="a-card">
+    <div class="a-top">
+      <div class="a-disc">1</div>
+      <div style="flex:1"><div class="a-name">Maddie</div><span class="a-pos">OH</span></div>
+      <span class="statuspill"><span class="d"></span>Playing Well</span>
+    </div>
+    <div class="a-body">
+      <div class="a-ringbox">
+        <svg viewBox="0 0 84 84"><circle class="ring-track" cx="42" cy="42" r="36" fill="none" stroke-width="7"/><circle cx="42" cy="42" r="36" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="90"/></svg>
+        <div class="cv"><div class="n" style="color:#22c55e">60%</div><div class="u">Hit %</div></div>
+      </div>
+      <div class="a-bars">
+        <div class="a-bar"><span class="l">Kills</span><span class="tr"><span class="fl" style="width:78%;background:#22c55e"></span></span><span class="v" style="color:#22c55e">7</span></div>
+        <div class="a-bar"><span class="l">Pass</span><span class="tr"><span class="fl" style="width:100%;background:#8b5cf6"></span></span><span class="v" style="color:#8b5cf6">100%</span></div>
+        <div class="a-bar"><span class="l">Serve</span><span class="tr"><span class="fl" style="width:83%;background:#eab308"></span></span><span class="v" style="color:#eab308">83%</span></div>
+        <div class="a-bar"><span class="l">Errors</span><span class="tr"><span class="fl" style="width:20%;background:#ef4444"></span></span><span class="v" style="color:#ef4444">2</span></div>
+      </div>
+    </div>
+    <div class="a-foot">
+      <span class="badge">🔥 Dominant attack tonight</span>
+      <span class="trend">▲ vs avg</span>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="opt-h"><span class="n">Option B</span><span class="t">Signature Card</span></div>
+  <div class="opt-note">A <b>collectible, broadcast feel</b> — crest, one giant signature stat (the thing they did best), a compact stat strip, and a "tonight" badge. Most <b>fun & engaging for players</b>; reads in one glance. Each card auto-picks the player's standout stat by position.</div>
+  <div class="b-card">
+    <div class="b-top">
+      <div class="b-crest">1</div>
+      <div style="flex:1"><div class="b-name">Maddie</div><div class="b-sub">#1 · Outside Hitter · 26 rotations</div></div>
+      <span class="statuspill"><span class="d"></span>Playing Well</span>
+    </div>
+    <div class="b-hero">
+      <span class="big">7</span><span class="biglbl">Kills</span><span class="tr">▲ best this season</span>
+    </div>
+    <div class="b-strip">
+      <div class="b-chip"><div class="v" style="color:#22c55e">60%</div><div class="l">Hit %</div></div>
+      <div class="b-chip"><div class="v" style="color:#8b5cf6">100%</div><div class="l">Pass</div></div>
+      <div class="b-chip"><div class="v" style="color:#eab308">83%</div><div class="l">Serve</div></div>
+      <div class="b-chip"><div class="v" style="color:#e2e8f0">10</div><div class="l">Swings</div></div>
+    </div>
+    <div class="b-badge">🔥 Dominant attack tonight · carried the offense in R3–R5</div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="opt-h"><span class="n">Option C</span><span class="t">Radar Profile</span></div>
+  <div class="opt-note">A <b>shape, not a list</b> — a radar across Attack / Serve / Pass / Defense / Hustle shows a player's profile at a glance. <b>Best for coaches</b> spotting strengths & gaps; visually distinctive. Compares to the player's own season shape (faint outline), never to teammates.</div>
+  <div class="c-card">
+    <div class="c-top">
+      <div class="c-disc">1</div>
+      <div style="flex:1"><div class="a-name" style="font-size:18px">Maddie</div><span class="a-pos">OH</span></div>
+      <span class="trend">▲ trending up</span>
+    </div>
+    <div class="c-body">
+      <svg class="c-radar" viewBox="0 0 150 150">
+        <polygon points="75,18 124,50 105,118 45,118 26,50" fill="none" stroke="#1e293b" stroke-width="1"/>
+        <polygon points="75,46 100,62 90,100 60,100 51,62" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="3 3"/>
+        <polygon points="75,22 120,52 98,112 50,108 32,56" fill="rgba(34,197,94,0.25)" stroke="#22c55e" stroke-width="2"/>
+        <text x="75" y="12" fill="#94a3b8" font-size="8" text-anchor="middle">ATK</text>
+        <text x="132" y="50" fill="#94a3b8" font-size="8" text-anchor="middle">SRV</text>
+        <text x="110" y="130" fill="#94a3b8" font-size="8" text-anchor="middle">PASS</text>
+        <text x="40" y="130" fill="#94a3b8" font-size="8" text-anchor="middle">DEF</text>
+        <text x="18" y="52" fill="#94a3b8" font-size="8" text-anchor="middle">HUS</text>
+      </svg>
+      <div class="c-side">
+        <div class="c-kv"><span class="l">Kills</span><span class="v" style="color:#22c55e">7</span></div>
+        <div class="c-kv"><span class="l">Hit %</span><span class="v" style="color:#22c55e">60%</span></div>
+        <div class="c-kv"><span class="l">Pass</span><span class="v" style="color:#8b5cf6">100%</span></div>
+        <div class="c-kv"><span class="l">Serve</span><span class="v" style="color:#eab308">83%</span></div>
+      </div>
+    </div>
+    <div class="c-badge">🔥 <b style="color:#e2e8f0">Dominant attack tonight</b> — biggest jump vs her season shape on the right side.</div>
+  </div>
+
+  <!-- OPTION D -->
+  <div class="opt-h"><span class="n">Option D</span><span class="t">Scannable Row</span></div>
+  <div class="opt-note">A <b>calm, list-first</b> view — each player a slim row with one highlight + a self-trend sparkline; tap to expand the full card. <b>Best for teams of 10+</b> and the <b>least comparison-y</b> layout (great template for the parent view). Fast to scan, low drama.</div>
+  <div class="d-list">
+    <div class="d-row mine">
+      <div class="d-disc">1</div>
+      <div class="d-mid"><div class="d-name">Maddie</div><div class="d-line">OH · <b>🔥 Dominant attack</b> · 60% hitting</div></div>
+      <div class="d-spark"><i style="height:40%"></i><i style="height:55%"></i><i style="height:50%"></i><i style="height:70%"></i><i style="height:100%"></i></div>
+      <div class="d-sig"><div class="v">7</div><div class="l">Kills</div></div>
+      <span class="d-chev">›</span>
+    </div>
+    <div class="d-row">
+      <div class="d-disc" style="border-color:#22c55e">6</div>
+      <div class="d-mid"><div class="d-name">Mia</div><div class="d-line">OH · <b>🎯 Efficient night</b> · 86% hitting</div></div>
+      <div class="d-spark"><i style="height:50%"></i><i style="height:45%"></i><i style="height:65%"></i><i style="height:80%"></i><i style="height:95%"></i></div>
+      <div class="d-sig"><div class="v">6</div><div class="l">Kills</div></div>
+      <span class="d-chev">›</span>
+    </div>
+    <div class="d-row">
+      <div class="d-disc" style="border-color:#3b82f6;color:#3b82f6">2</div>
+      <div class="d-mid"><div class="d-name">Ivy</div><div class="d-line">MB · <b>🧱 Wall at the net</b> · 100% hitting</div></div>
+      <div class="d-spark"><i style="height:30%;background:#3b82f6"></i><i style="height:50%;background:#3b82f6"></i><i style="height:45%;background:#3b82f6"></i><i style="height:60%;background:#3b82f6"></i><i style="height:75%;background:#3b82f6"></i></div>
+      <div class="d-sig"><div class="v" style="color:#3b82f6">1</div><div class="l">Block</div></div>
+      <span class="d-chev">›</span>
+    </div>
+  </div>
+
+  <div class="lede" style="margin-top:28px">My pick: <b style="color:#e2e8f0">B (Signature Card)</b> for the headline player feel, with <b style="color:#e2e8f0">D (Scannable Row)</b> as the list and the parent-view template. A and C are great as the tap-in detail view.</div>
+</div>
+</body>
+</html>

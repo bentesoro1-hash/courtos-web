@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#060b14"/>
+<title>CourtOS · Player Detail — Option B redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#060b14;--card:#0f172a;--card2:#0b1120;--line:#1e293b;--line2:#161f30;
+    --txt:#f8fafc;--txt2:#94a3b8;--txt3:#475569;--txt4:#334155;
+    --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--gold:#eab308;--purple:#a855f7;--teal:#14b8a6;--orange:#f97316;
+    --head:"Barlow Condensed","Barlow",system-ui,sans-serif;--body:"Barlow",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#05080f;}
+  body{font-family:var(--body);color:var(--txt);display:flex;justify-content:center;min-height:100vh;}
+  .app{width:100%;max-width:430px;background:var(--bg);min-height:100vh;padding-bottom:40px;overflow-x:hidden;}
+  @media(min-width:480px){body{padding:24px;align-items:flex-start;}.app{border-radius:34px;border:1px solid #11182a;box-shadow:0 30px 90px rgba(0,0,0,.6);overflow:hidden;}}
+  .barlow{font-family:var(--head);}
+
+  /* sticky header */
+  .hdr{position:sticky;top:0;z-index:20;background:rgba(6,11,20,.92);backdrop-filter:blur(12px);padding:16px 16px 0;}
+  .hdr-row{display:flex;align-items:center;gap:13px;}
+  .crest{width:58px;height:58px;border-radius:16px;background:linear-gradient(160deg,var(--green),#15803d);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:900;font-size:24px;color:#04130a;box-shadow:0 6px 20px rgba(34,197,94,.4);}
+  .hid{flex:1;min-width:0;}
+  .hid .nm{font-family:var(--head);font-weight:900;font-size:30px;line-height:.9;letter-spacing:-.01em;}
+  .hid .sub{font-size:12px;color:var(--green);font-weight:700;margin-top:4px;}
+  .hbtn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt2);cursor:pointer;}
+  .tabs{display:flex;gap:24px;margin-top:16px;border-bottom:1px solid var(--line);}
+  .tabs button{background:none;border:none;color:var(--txt3);font-family:var(--head);font-weight:800;font-size:15px;padding:10px 0;cursor:pointer;position:relative;letter-spacing:.02em;}
+  .tabs button.on{color:#60a5fa;}
+  .tabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#60a5fa;border-radius:2px;}
+
+  .sec{margin:18px 16px 0;}
+  .cap{font-size:10px;color:var(--txt4);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:0 2px 9px;}
+
+  /* signature hero (Option B feel) */
+  .sig{border-radius:18px;padding:16px;position:relative;overflow:hidden;background:linear-gradient(150deg,#143524,#0c1626 58%);border:1px solid rgba(34,197,94,.4);}
+  .sig::after{content:"";position:absolute;right:-30px;top:-34px;width:150px;height:150px;border-radius:999px;background:radial-gradient(circle,rgba(34,197,94,.18),transparent 70%);pointer-events:none;}
+  .sig-hero{display:flex;align-items:flex-end;gap:11px;position:relative;}
+  .sig-hero .big{font-family:var(--head);font-weight:900;font-size:60px;line-height:.82;color:var(--green);}
+  .sig-hero .lbl{font-family:var(--head);font-weight:800;font-size:15px;color:#e2e8f0;text-transform:uppercase;letter-spacing:.04em;padding-bottom:7px;}
+  .sig-hero .tr{margin-left:auto;font-size:11px;font-weight:800;color:var(--green);padding-bottom:8px;}
+  .sig-badge{margin-top:12px;font-size:12.5px;color:#e2e8f0;display:flex;align-items:center;gap:8px;position:relative;}
+  .sig-strip{display:flex;gap:7px;margin-top:14px;position:relative;}
+  .sig-chip{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:11px;padding:8px 4px;text-align:center;}
+  .sig-chip .v{font-family:var(--head);font-weight:900;font-size:17px;line-height:1;}
+  .sig-chip .l{font-size:7.5px;color:var(--txt3);text-transform:uppercase;margin-top:4px;letter-spacing:.03em;}
+
+  /* box score tiles */
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 4px;text-align:center;}
+  .tile .v{font-family:var(--head);font-weight:900;font-size:26px;line-height:1;}
+  .tile .l{font-size:8px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-top:5px;}
+  .splits{display:flex;justify-content:space-between;margin:11px 4px 0;font-size:12px;color:var(--txt2);}
+  .splits b{color:#e2e8f0;font-weight:700;}
+
+  /* passing */
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;}
+  .p-top{display:flex;align-items:baseline;gap:9px;margin-bottom:11px;}
+  .p-top .big{font-family:var(--head);font-weight:900;font-size:34px;color:var(--green);line-height:1;}
+  .p-top .u{font-size:12px;color:var(--txt3);}
+  .p-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#13203a;}
+  .p-bar i{height:100%;}
+  .p-legend{display:flex;justify-content:space-between;margin-top:9px;font-size:11px;}
+
+  /* point map */
+  .seg{display:flex;gap:7px;margin-bottom:9px;}
+  .seg button{font-family:var(--head);font-weight:800;font-size:12px;color:var(--txt3);background:#0b1322;border:1px solid var(--line);border-radius:999px;padding:7px 16px;cursor:pointer;}
+  .seg button.on{color:#04130a;background:var(--green);}
+  .seg.tog button{flex:1;border-radius:11px;}
+  .seg.tog button.on{color:#04130a;background:var(--green);}
+  .courtwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;}
+  .court-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .court-h .t{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;font-weight:700;display:flex;align-items:center;gap:7px;}
+  .court-h .dot{width:7px;height:7px;border-radius:999px;background:var(--green);}
+  .court-h .pts{font-size:11px;font-weight:800;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:2px 9px;}
+  .court{position:relative;width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(180deg,#2a1410 0 49.5%,#1c1108 49.5% 50%,#0f2418 50% 100%);}
+  .court .net{position:absolute;left:0;right:0;top:50%;height:2px;background:var(--gold);}
+  .court .vline{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.07);}
+  .court .hline{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.06);}
+  .court .lbl{position:absolute;font-size:9px;font-weight:700;letter-spacing:.06em;}
+  .mk{position:absolute;transform:translate(-50%,-50%);}
+  .mk.kill{width:13px;height:13px;border-radius:999px;border:2px solid var(--green);}
+  .mk.err{color:var(--orange);font-size:13px;font-weight:900;}
+  .foot{text-align:center;font-size:11px;color:#1e293b;margin-top:24px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div class="crest">1</div>
+      <div class="hid"><div class="nm">MADDIE</div><div class="sub">#1 · OUTSIDE HITTER · 26 rotations</div></div>
+      <div class="hbtn">↗</div>
+      <div class="hbtn">✕</div>
+    </div>
+    <div class="tabs">
+      <button class="on">Match</button><button>Season</button><button>History</button>
+    </div>
+  </div>
+
+  <!-- SIGNATURE HERO -->
+  <div class="sec">
+    <div class="sig">
+      <div class="sig-hero"><span class="big">7</span><span class="lbl">Kills</span><span class="tr">▲ best this season</span></div>
+      <div class="sig-badge">🔥 Dominant attack tonight · led the team in R3–R5</div>
+      <div class="sig-strip">
+        <div class="sig-chip"><div class="v" style="color:#22c55e">60%</div><div class="l">Hit %</div></div>
+        <div class="sig-chip"><div class="v" style="color:#22c55e">100%</div><div class="l">Pass</div></div>
+        <div class="sig-chip"><div class="v" style="color:#eab308">83%</div><div class="l">Serve</div></div>
+        <div class="sig-chip"><div class="v" style="color:#e2e8f0">9</div><div class="l">Points</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOX SCORE -->
+  <div class="sec">
+    <div class="cap">Box Score · Match</div>
+    <div class="tiles">
+      <div class="tile"><div class="v" style="color:#22c55e">7</div><div class="l">Kills</div></div>
+      <div class="tile"><div class="v" style="color:#3b82f6">0</div><div class="l">Aces</div></div>
+      <div class="tile"><div class="v" style="color:#a855f7">0</div><div class="l">Blocks</div></div>
+      <div class="tile"><div class="v" style="color:#14b8a6">0</div><div class="l">Digs</div></div>
+    </div>
+    <div class="tiles" style="margin-top:8px">
+      <div class="tile"><div class="v" style="color:#22c55e">60%</div><div class="l">Hit %</div></div>
+      <div class="tile"><div class="v" style="color:#22c55e">83%</div><div class="l">Srv %</div></div>
+      <div class="tile"><div class="v" style="color:#22c55e">100%</div><div class="l">Pass %</div></div>
+      <div class="tile"><div class="v" style="color:#ef4444">2</div><div class="l">Errors</div></div>
+    </div>
+    <div class="splits"><span>Attack <b>7–1</b> · 10 att</span><span>Serve <b>0 ace</b> · 6 att</span></div>
+  </div>
+
+  <!-- PASSING -->
+  <div class="sec">
+    <div class="cap">Passing</div>
+    <div class="pcard">
+      <div class="p-top"><span class="big">3.0</span><span class="u">avg · 1 attempt</span></div>
+      <div class="p-bar"><i style="width:100%;background:#22c55e"></i></div>
+      <div class="p-legend">
+        <span style="color:#22c55e">3-pass · 100%</span>
+        <span style="color:#eab308">2-pass · 0%</span>
+        <span style="color:#ef4444">1-pass · 0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POINT MAP -->
+  <div class="sec">
+    <div class="cap">Point Map</div>
+    <div class="seg">
+      <button class="on">All</button><button>Won</button><button>Lost</button>
+    </div>
+    <div class="seg tog">
+      <button class="on">Markers</button><button>Heat Map</button>
+    </div>
+    <div class="courtwrap" style="margin-top:9px">
+      <div class="court-h">
+        <span class="t"><span class="dot"></span>Attack Distribution</span>
+        <span class="pts">9 pts</span>
+      </div>
+      <div class="court">
+        <div class="net"></div>
+        <div class="vline" style="left:33.3%"></div><div class="vline" style="left:66.6%"></div>
+        <div class="hline" style="top:25%"></div><div class="hline" style="top:75%"></div>
+        <div class="lbl" style="top:8px;left:10px;color:#fca5a5">OPP</div>
+        <div class="lbl" style="bottom:8px;left:10px;color:#86efac">US</div>
+        <div class="mk kill" style="left:57%;top:21%"></div>
+        <div class="mk kill" style="left:50%;top:28%"></div>
+        <div class="mk kill" style="left:66%;top:27%"></div>
+        <div class="mk kill" style="left:77%;top:20%"></div>
+        <div class="mk kill" style="left:62%;top:34%"></div>
+        <div class="mk err" style="left:72%;top:6%">✕</div>
+        <div class="mk err" style="left:53%;top:84%">✕</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">Reference · player detail page in the Option B style</div>
+</div>
+</body>
+</html>

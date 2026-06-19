@@ -57,12 +57,22 @@ interface LiveRecentPlay {
   their: number
 }
 
+interface LiveShot {
+  x: number // 0=left .. 1=right
+  y: number // 0=opponent baseline .. 1=our baseline
+  type: 'kill' | 'ace' | 'block' | 'error'
+  jersey: number | null
+  us: boolean
+}
+
 interface LiveStatsSnapshot {
   updatedAt: string
   team: LiveTeamLine
   players: LivePlayerLine[]
   court?: LiveCourtSlot[]
   recentPlays?: LiveRecentPlay[]
+  lineupR1?: LiveCourtSlot[]
+  shots?: LiveShot[]
 }
 
 // Role colors mirror the app's positionColors.ts (short labels).
@@ -107,6 +117,29 @@ function coordFor(system: string, fmt: CourtFmt, rotation: number, pos: number):
   const a = fmt === 'base' ? BASE_COORDS[pos - 1] : FORM_COORDS[sys][fmt][r - 1][pos - 1]
   return { x: a[0], y: a[1] }
 }
+
+// On-court players for any rotation, from the R1 base lineup: decrement-clockwise
+// rotation math + libero-stays-in-back-row swap (mirrors the app display pipeline).
+function onCourtForRotation(lineupR1: LiveCourtSlot[], rotation: number): Record<number, LiveCourtSlot> {
+  const base: Record<number, LiveCourtSlot> = {}
+  for (const s of lineupR1) base[s.pos] = s
+  const by: Record<number, LiveCourtSlot> = {}
+  for (let p = 1; p <= 6; p++) {
+    const dp = ((p - 1 - (rotation - 1) + 6) % 6) + 1
+    if (base[p]) by[dp] = base[p]
+  }
+  let lib: number | null = null
+  for (let dp = 1; dp <= 6; dp++) if (by[dp] && by[dp].position === 'L') lib = dp
+  if (lib && [4, 3, 2].includes(lib)) {
+    let sw: number | null = null
+    for (const dp of [6, 5, 1]) if (by[dp] && by[dp].position === 'MB') { sw = dp; break }
+    if (!sw) sw = 6
+    const t = by[lib]; by[lib] = by[sw]; by[sw] = t
+  }
+  return by
+}
+
+const SHOT_COLOR: Record<string, string> = { kill: '#22c55e', ace: '#eab308', block: '#3b82f6', error: '#ef4444' }
 
 // Current scoring run, derived from recentPlays (newest first).
 function computeRun(plays: LiveRecentPlay[] | undefined): { us: boolean; len: number } {
@@ -213,6 +246,8 @@ export default function LiveClient() {
   const [myJersey, setMyJersey] = useState<number | null>(null)
   const [fmt, setFmt] = useState<CourtFmt>('receive')
   const [fmtManual, setFmtManual] = useState(false)
+  const [viewRot, setViewRot] = useState<number | null>(null) // null = follow live rotation
+  const [mapFilter, setMapFilter] = useState<'all' | 'kill' | 'ace' | 'error'>('all')
 
   const channelRef = useRef<any>(null)
 
@@ -679,10 +714,14 @@ export default function LiveClient() {
           </div>
         )}
 
-        {/* ── On Court — Base / Serve / Receive ── */}
-        {snap?.court && snap.court.length > 0 && (() => {
-          const byPos: Record<number, LiveCourtSlot> = {}
-          for (const s of snap.court) byPos[s.pos] = s
+        {/* ── On Court — Base / Serve / Receive (+ R1–R6 scrub) ── */}
+        {((snap?.lineupR1 && snap.lineupR1.length > 0) || (snap?.court && snap.court.length > 0)) && (() => {
+          const canScrub = !!(snap?.lineupR1 && snap.lineupR1.length > 0)
+          const rot = canScrub ? (viewRot ?? matchData.current_rotation) : matchData.current_rotation
+          const byPos: Record<number, LiveCourtSlot> = canScrub
+            ? onCourtForRotation(snap!.lineupR1!, rot)
+            : (() => { const m: Record<number, LiveCourtSlot> = {}; for (const s of (snap?.court ?? [])) m[s.pos] = s; return m })()
+          const previewing = canScrub && viewRot != null && viewRot !== matchData.current_rotation
           const X = (x: number) => `${6 + x * 88}%`
           const Y = (y: number) => `${8 + y * 84}%`
           return (
@@ -691,6 +730,18 @@ export default function LiveClient() {
                 <span style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>On Court</span>
                 <span className={BARLOW} style={{ fontSize: '11px', fontWeight: 800, color: '#eab308', backgroundColor: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.35)', borderRadius: '999px', padding: '2px 9px' }}>{system}</span>
               </div>
+              {canScrub && (
+                <div className="flex" style={{ gap: '4px', marginBottom: '8px', overflowX: 'auto' }}>
+                  <button onClick={() => setViewRot(null)} className={BARLOW} style={{ flexShrink: 0, fontSize: '11px', fontWeight: 800, padding: '5px 9px', borderRadius: '8px', cursor: 'pointer', color: viewRot === null ? '#22c55e' : '#64748b', background: '#0b1322', border: `1px solid ${viewRot === null ? 'rgba(34,197,94,0.5)' : '#1e293b'}` }}>LIVE</button>
+                  {[1, 2, 3, 4, 5, 6].map((r) => {
+                    const cur = rot === r
+                    return (
+                      <button key={r} onClick={() => setViewRot(r === matchData.current_rotation ? null : r)} className={BARLOW}
+                        style={{ flexShrink: 0, fontSize: '11px', fontWeight: 800, padding: '5px 10px', borderRadius: '8px', cursor: 'pointer', color: cur ? '#fff' : '#64748b', background: cur ? 'rgba(59,130,246,0.2)' : '#0b1322', border: `1px solid ${cur ? '#3b82f6' : '#1e293b'}` }}>R{r}</button>
+                    )
+                  })}
+                </div>
+              )}
               <div className="flex" style={{ gap: '5px', marginBottom: '8px' }}>
                 {(['base', 'serve', 'receive'] as CourtFmt[]).map((f) => {
                   const on = fmtEff === f
@@ -710,7 +761,7 @@ export default function LiveClient() {
                   const s = byPos[pos]
                   if (!s) return null
                   const c = posColor(s.position)
-                  const cc = coordFor(system, fmtEff, matchData.current_rotation, pos)
+                  const cc = coordFor(system, fmtEff, rot, pos)
                   const serving = fmtEff === 'serve' && pos === 1
                   const mine = myJersey === s.jersey
                   return (
@@ -726,10 +777,53 @@ export default function LiveClient() {
                 })}
               </div>
               <div style={{ textAlign: 'center', fontSize: '10px', color: '#475569', marginTop: '9px', fontWeight: 600 }}>
-                {fmtEff === 'serve' ? 'Serving formation' : fmtEff === 'receive' ? 'Serve-receive' : 'Base positions'} · Rotation {matchData.current_rotation} · {system}
-                {fmtManual
-                  ? <button onClick={() => setFmtManual(false)} style={{ color: '#22c55e', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '10px', fontWeight: 700 }}> · ↺ live</button>
-                  : <span style={{ color: servingUs ? '#22c55e' : '#f59e0b' }}> · live</span>}
+                {fmtEff === 'serve' ? 'Serving formation' : fmtEff === 'receive' ? 'Serve-receive' : 'Base positions'} · Rotation {rot} · {system}
+                {previewing
+                  ? <button onClick={() => setViewRot(null)} style={{ color: '#22c55e', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '10px', fontWeight: 700 }}> · preview — tap LIVE</button>
+                  : fmtManual
+                    ? <button onClick={() => setFmtManual(false)} style={{ color: '#22c55e', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '10px', fontWeight: 700 }}> · ↺ live</button>
+                    : <span style={{ color: servingUs ? '#22c55e' : '#f59e0b' }}> · live</span>}
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* ── Stat Map — where points are scored ── */}
+        {snap?.shots && snap.shots.length > 0 && (() => {
+          const all = snap.shots
+          const shots = all.filter((s) => mapFilter === 'all' || s.type === mapFilter)
+          const k = all.filter((s) => s.type === 'kill').length
+          const a = all.filter((s) => s.type === 'ace').length
+          const e = all.filter((s) => s.type === 'error').length
+          const filters: { key: 'all' | 'kill' | 'ace' | 'error'; label: string }[] = [
+            { key: 'all', label: 'All' }, { key: 'kill', label: 'Kills' }, { key: 'ace', label: 'Aces' }, { key: 'error', label: 'Errors' },
+          ]
+          return (
+            <div className="mx-4 mt-3 rounded-xl" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '12px' }}>
+              <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '9px' }}>Stat Map · where points happen</div>
+              <div className="flex" style={{ gap: '5px', marginBottom: '9px' }}>
+                {filters.map((f) => {
+                  const on = mapFilter === f.key
+                  return (
+                    <button key={f.key} onClick={() => setMapFilter(f.key)} className={BARLOW}
+                      style={{ flex: 1, fontSize: '11px', fontWeight: 800, padding: '6px 0', borderRadius: '8px', cursor: 'pointer', color: on ? '#04130a' : '#64748b', background: on ? '#22c55e' : '#0b1322', border: `1px solid ${on ? '#22c55e' : '#1e293b'}` }}>
+                      {f.label}
+                    </button>
+                  )
+                })}
+              </div>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', borderRadius: '12px', overflow: 'hidden', border: '1px solid #1e293b', background: 'linear-gradient(180deg,#241410 0 49.5%,#1a1108 49.5% 50.5%,#0f2418 50.5% 100%)' }}>
+                <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', height: '2px', background: '#eab308', transform: 'translateY(-1px)' }} />
+                <div style={{ position: 'absolute', top: '8px', left: '10px', fontSize: '9px', fontWeight: 700, color: '#fca5a5' }}>OPP</div>
+                <div style={{ position: 'absolute', bottom: '8px', left: '10px', fontSize: '9px', fontWeight: 700, color: '#86efac' }}>US</div>
+                {shots.map((s, i) => (
+                  s.type === 'error'
+                    ? <div key={i} style={{ position: 'absolute', left: `${s.x * 100}%`, top: `${s.y * 100}%`, transform: 'translate(-50%,-50%)', color: SHOT_COLOR.error, fontSize: '13px', fontWeight: 900 }}>✕</div>
+                    : <div key={i} style={{ position: 'absolute', left: `${s.x * 100}%`, top: `${s.y * 100}%`, transform: 'translate(-50%,-50%)', width: '12px', height: '12px', borderRadius: '999px', border: `2px solid ${SHOT_COLOR[s.type]}`, boxShadow: `0 0 8px ${SHOT_COLOR[s.type]}` }} />
+                ))}
+              </div>
+              <div style={{ textAlign: 'center', fontSize: '10px', color: '#475569', marginTop: '9px', fontWeight: 600 }}>
+                {k} kills · {a} aces · {e} errors mapped
               </div>
             </div>
           )

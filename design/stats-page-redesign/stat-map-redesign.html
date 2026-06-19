@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#060b14"/>
+<title>CourtOS · Stat Map — redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#060b14;--card:#0f172a;--card2:#0b1120;--line:#1e293b;--line2:#161f30;
+    --txt:#f8fafc;--txt2:#94a3b8;--txt3:#475569;--txt4:#334155;
+    --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--gold:#eab308;--purple:#a855f7;--teal:#14b8a6;--orange:#f97316;
+    --head:"Barlow Condensed","Barlow",system-ui,sans-serif;--body:"Barlow",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#05080f;}
+  body{font-family:var(--body);color:var(--txt);display:flex;justify-content:center;min-height:100vh;}
+  .app{width:100%;max-width:430px;background:var(--bg);min-height:100vh;padding-bottom:44px;overflow-x:hidden;}
+  @media(min-width:480px){body{padding:24px;align-items:flex-start;}.app{border-radius:34px;border:1px solid #11182a;box-shadow:0 30px 90px rgba(0,0,0,.6);overflow:hidden;}}
+  .barlow{font-family:var(--head);}
+  .logo{font-family:var(--head);font-weight:900;font-size:19px;text-align:center;padding:14px 0 10px;}
+  .logo b{color:var(--txt);} .logo span{color:var(--green);}
+  .tabs{display:flex;gap:6px;margin:0 14px 12px;background:#0b1322;border:1px solid var(--line);border-radius:14px;padding:5px;}
+  .tabs button{flex:1;font-family:var(--head);font-weight:800;font-size:13px;color:var(--txt3);background:transparent;border:none;border-radius:10px;padding:10px 0;cursor:pointer;}
+  .tabs button.on{color:#fff;background:var(--purple);box-shadow:0 0 16px rgba(168,85,247,.4);}
+
+  .sec{margin:16px 14px 0;}
+  .cap{font-size:10px;color:var(--txt4);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:0 2px 9px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;}
+
+  /* filters */
+  .filters{display:flex;gap:6px;overflow-x:auto;padding:0 14px;margin-bottom:10px;}
+  .filters::-webkit-scrollbar{display:none;}
+  .chip{flex-shrink:0;font-family:var(--head);font-weight:800;font-size:12px;letter-spacing:.04em;color:var(--txt3);background:#0b1322;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;}
+  .chip.on{color:#04130a;background:var(--green);border-color:var(--green);}
+  /* match/season seg */
+  .seg{display:flex;margin:0 14px 4px;background:#0b1322;border:1px solid var(--line);border-radius:12px;padding:4px;}
+  .seg button{flex:1;font-family:var(--head);font-weight:800;font-size:13px;color:var(--txt3);background:transparent;border:none;border-radius:9px;padding:9px 0;cursor:pointer;}
+  .seg button.on{color:#04130a;background:var(--green);}
+
+  /* Court IQ band */
+  .iq{display:flex;gap:8px;}
+  .iq-tile{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center;position:relative;overflow:hidden;}
+  .iq-tile .v{font-family:var(--head);font-weight:900;font-size:24px;line-height:1;}
+  .iq-tile .l{font-size:8px;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em;margin-top:5px;}
+  .iq-tile .s{font-size:9px;color:var(--txt2);margin-top:2px;}
+
+  /* court */
+  .court-card{padding:14px;}
+  .court-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .court-h .t{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;font-weight:700;display:flex;align-items:center;gap:7px;}
+  .court-h .dot{width:7px;height:7px;border-radius:999px;background:var(--green);}
+  .court-h .pts{font-family:var(--head);font-weight:800;font-size:12px;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:2px 10px;}
+  .court{position:relative;width:100%;aspect-ratio:1/1.05;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(180deg,#241410 0 49.4%,#1a1108 49.4% 50.6%,#0f2418 50.6% 100%);}
+  .court .heat{position:absolute;inset:0;background:
+    radial-gradient(60px 42px at 73% 22%, rgba(239,115,22,.7), transparent 70%),
+    radial-gradient(40px 30px at 26% 24%, rgba(234,179,8,.5), transparent 70%),
+    radial-gradient(64px 50px at 50% 74%, rgba(234,179,8,.5), transparent 70%);pointer-events:none;}
+  .court .net{position:absolute;left:0;right:0;top:50%;height:3px;background:var(--gold);transform:translateY(-1.5px);}
+  .court .v{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.08);}
+  .court .h{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.06);}
+  .court .znum{position:absolute;font-family:var(--head);font-weight:800;font-size:10px;color:rgba(255,255,255,.28);}
+  .court .end{position:absolute;font-size:9px;font-weight:700;letter-spacing:.06em;}
+  .togg{display:flex;gap:6px;margin-top:10px;}
+  .togg button{flex:1;font-family:var(--head);font-weight:800;font-size:12px;color:var(--txt3);background:#0b1322;border:1px solid var(--line);border-radius:10px;padding:8px 0;cursor:pointer;}
+  .togg button.on{color:#04130a;background:var(--purple);border-color:var(--purple);}
+
+  /* zone breakdown */
+  .zone-row{display:flex;align-items:center;gap:9px;padding:6px 0;}
+  .zone-row .z{width:26px;font-family:var(--head);font-weight:800;font-size:12px;color:var(--txt2);}
+  .zone-row .tr{flex:1;height:14px;border-radius:5px;background:#13203a;overflow:hidden;}
+  .zone-row .fl{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-family:var(--head);font-weight:900;font-size:10px;color:#04130a;}
+  .zone-row .pctv{width:34px;text-align:right;font-size:10px;color:var(--txt3);}
+
+  /* scout notes */
+  .note{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;border-left-width:3px;}
+  .note.hot{border-left-color:var(--orange);}
+  .note.weak{border-left-color:var(--red);}
+  .note.press{border-left-color:var(--green);}
+  .note .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:rgba(255,255,255,.04);}
+  .note .tt{font-family:var(--head);font-weight:800;font-size:14px;}
+  .note.hot .tt{color:var(--orange);} .note.weak .tt{color:#f87171;} .note.press .tt{color:var(--green);}
+  .note .ds{font-size:12px;color:var(--txt2);margin-top:2px;line-height:1.3;}
+
+  /* rotation */
+  .rotchips{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;}
+  .rotchips::-webkit-scrollbar{display:none;}
+  .rotchip{flex-shrink:0;font-family:var(--head);font-weight:800;font-size:12px;color:var(--txt3);background:#0b1322;border:1px solid var(--line);border-radius:9px;padding:7px 13px;cursor:pointer;}
+  .rotchip.on{color:#04130a;background:var(--green);border-color:var(--green);}
+  .perf{padding:15px;}
+  .perf-tiles{display:flex;gap:10px;}
+  .perf-tile{flex:1;text-align:center;}
+  .perf-tile .v{font-family:var(--head);font-weight:900;font-size:30px;line-height:1;}
+  .perf-tile .l{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+  .rbars{margin-top:15px;padding-top:13px;border-top:1px solid var(--line);}
+  .rbar{display:flex;align-items:center;gap:9px;padding:4px 0;}
+  .rbar .l{width:26px;font-family:var(--head);font-weight:800;font-size:12px;color:var(--txt2);}
+  .rbar .mid{flex:1;height:16px;position:relative;display:flex;align-items:center;}
+  .rbar .center{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.12);}
+  .rbar .seg{position:absolute;height:16px;border-radius:5px;}
+  .rbar .vv{width:32px;font-family:var(--head);font-weight:900;font-size:12px;text-align:right;}
+  .foot{text-align:center;font-size:11px;color:#1e293b;margin-top:24px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="logo"><b>Court</b><span>OS</span></div>
+  <div class="tabs"><button>TEAM</button><button>PLAYERS</button><button class="on">STAT MAP</button></div>
+
+  <!-- filters -->
+  <div class="filters">
+    <button class="chip on">All</button>
+    <button class="chip">Kills</button>
+    <button class="chip">Errors</button>
+    <button class="chip">Serves</button>
+    <button class="chip">Blocks</button>
+    <button class="chip">Opp</button>
+  </div>
+  <div class="seg"><button class="on">Match</button><button>Season</button></div>
+
+  <!-- Court IQ band -->
+  <div class="sec">
+    <div class="cap">Court IQ · 26 pts mapped</div>
+    <div class="iq">
+      <div class="iq-tile"><div class="v" style="color:var(--orange)">Z6</div><div class="l">Hot Zone</div><div class="s">31% of points</div></div>
+      <div class="iq-tile"><div class="v" style="color:#f87171">Z3</div><div class="l">Weak Side</div><div class="s">3 errors</div></div>
+      <div class="iq-tile"><div class="v" style="color:var(--green)">85%</div><div class="l">Pressure</div><div class="s">opp court</div></div>
+    </div>
+  </div>
+
+  <!-- court -->
+  <div class="sec">
+    <div class="card court-card">
+      <div class="court-h"><span class="t"><span class="dot"></span>Attack Distribution</span><span class="pts">26 pts</span></div>
+      <div class="court">
+        <div class="heat"></div>
+        <div class="net"></div>
+        <div class="v" style="left:33.3%"></div><div class="v" style="left:66.6%"></div>
+        <div class="h" style="top:25%"></div><div class="h" style="top:75%"></div>
+        <div class="end" style="top:8px;left:10px;color:#fca5a5">OPP</div>
+        <div class="end" style="bottom:8px;left:10px;color:#86efac">US</div>
+        <!-- zone numbers: opponent half Z4 Z3 Z2 (front), back; our half mirrored -->
+        <div class="znum" style="left:14%;top:14%">Z4</div><div class="znum" style="left:48%;top:14%">Z3</div><div class="znum" style="left:82%;top:14%">Z2</div>
+        <div class="znum" style="left:14%;top:39%">Z5</div><div class="znum" style="left:48%;top:39%">Z6</div><div class="znum" style="left:82%;top:39%">Z1</div>
+        <div class="znum" style="left:14%;top:60%">Z5</div><div class="znum" style="left:48%;top:60%">Z6</div><div class="znum" style="left:82%;top:60%">Z1</div>
+        <div class="znum" style="left:14%;top:85%">Z4</div><div class="znum" style="left:48%;top:85%">Z3</div><div class="znum" style="left:82%;top:85%">Z2</div>
+      </div>
+      <div class="togg"><button class="on">Heatmap</button><button>X / O Markers</button></div>
+    </div>
+  </div>
+
+  <!-- zone breakdown (readable) -->
+  <div class="sec">
+    <div class="cap">By Zone · share of points</div>
+    <div class="card" style="padding:13px 15px">
+      <div class="zone-row"><span class="z">Z6</span><span class="tr"><span class="fl" style="width:31%;background:var(--orange)">31%</span></span><span class="pctv">8 pts</span></div>
+      <div class="zone-row"><span class="z">Z2</span><span class="tr"><span class="fl" style="width:23%;background:var(--green)">23%</span></span><span class="pctv">6 pts</span></div>
+      <div class="zone-row"><span class="z">Z4</span><span class="tr"><span class="fl" style="width:19%;background:var(--green)">19%</span></span><span class="pctv">5 pts</span></div>
+      <div class="zone-row"><span class="z">Z1</span><span class="tr"><span class="fl" style="width:15%;background:var(--green)">15%</span></span><span class="pctv">4 pts</span></div>
+      <div class="zone-row"><span class="z">Z3</span><span class="tr"><span class="fl" style="width:12%;background:var(--gold)">12%</span></span><span class="pctv">3 pts</span></div>
+    </div>
+  </div>
+
+  <!-- scout notes -->
+  <div class="sec">
+    <div class="cap">Scout Notes</div>
+    <div class="note hot"><div class="ic">🔥</div><div><div class="tt">Hot Zone · Z6</div><div class="ds">Middle back drives 31% of all points — keep feeding it.</div></div></div>
+    <div class="note weak"><div class="ic">⚠️</div><div><div class="tt">Weak Side · Z3</div><div class="ds">Middle front has 3 errors — the team's biggest leak.</div></div></div>
+    <div class="note press"><div class="ic">⚡</div><div><div class="tt">Offensive Pressure</div><div class="ds">85% of activity is in the opponent's court — strong attacking game.</div></div></div>
+  </div>
+
+  <!-- rotation -->
+  <div class="sec">
+    <div class="cap">View by Rotation</div>
+    <div class="rotchips">
+      <button class="rotchip on">All</button><button class="rotchip">R1</button><button class="rotchip">R2</button>
+      <button class="rotchip">R3</button><button class="rotchip">R4</button><button class="rotchip">R5</button><button class="rotchip">R6</button>
+    </div>
+    <div class="card perf">
+      <div class="cap" style="margin-bottom:13px">All Rotations · Performance</div>
+      <div class="perf-tiles">
+        <div class="perf-tile"><div class="v" style="color:var(--green)">19</div><div class="l">Won</div></div>
+        <div class="perf-tile"><div class="v" style="color:#f87171">7</div><div class="l">Lost</div></div>
+        <div class="perf-tile"><div class="v" style="color:var(--green)">+12</div><div class="l">Diff</div></div>
+      </div>
+      <div class="rbars">
+        <div class="rbar"><span class="l">R1</span><div class="mid"><div class="center"></div><div class="seg" style="left:50%;width:33%;background:var(--green)"></div></div><span class="vv" style="color:var(--green)">+7</span></div>
+        <div class="rbar"><span class="l">R2</span><div class="mid"><div class="center"></div><div class="seg" style="left:50%;width:6%;background:var(--green)"></div></div><span class="vv" style="color:var(--green)">+1</span></div>
+        <div class="rbar"><span class="l">R3</span><div class="mid"><div class="center"></div></div><span class="vv" style="color:var(--txt3)">0</span></div>
+        <div class="rbar"><span class="l">R4</span><div class="mid"><div class="center"></div><div class="seg" style="left:50%;width:16%;background:var(--green)"></div></div><span class="vv" style="color:var(--green)">+3</span></div>
+        <div class="rbar"><span class="l">R5</span><div class="mid"><div class="center"></div><div class="seg" style="left:50%;width:11%;background:var(--green)"></div></div><span class="vv" style="color:var(--green)">+2</span></div>
+        <div class="rbar"><span class="l">R6</span><div class="mid"><div class="center"></div><div class="seg" style="right:50%;width:6%;background:#ef4444"></div></div><span class="vv" style="color:#f87171">−1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">Reference · Stat Map redesign</div>
+</div>
+</body>
+</html>
