@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0",
+  "generated": "2026-06-19",
+  "app": {
+    "name": "courtos-web",
+    "purpose": "Marketing site + legal pages + live match broadcast viewer + SEO blog for the CourtOS volleyball app.",
+    "domain": "https://courtos.co",
+    "stack": ["Next.js 16 (App Router, Turbopack)", "React 19", "TypeScript", "Tailwind CSS 3", "Supabase JS", "Resend (email)", "Vercel (hosting)"],
+    "sibling_repo": "volleyiq-coach (the React Native app). See cross_repo."
+  },
+  "edge_types": {
+    "renders": "page/component renders target",
+    "depends_on": "needs target to function",
+    "reads": "reads data from target",
+    "writes": "writes data to target",
+    "calls": "invokes target (API route / service)",
+    "links_to": "navigational link to target",
+    "uses": "imports target as utility/component",
+    "cross_repo": "relationship to a node in the volleyiq-coach knowledge graph"
+  },
+  "cross_repo": {
+    "_comment": "courtos-web shares a Supabase project and product with volleyiq-coach. These are the bridges. The app-side graph is at ../../volleyiq-coach/knowledge/graph/index.json (sibling folder).",
+    "shared_supabase_project": "Same Supabase project as the app (same project ref). Web uses NEXT_PUBLIC anon key + RLS.",
+    "bridges": [
+      {"web_node": "live-viewer", "app_node": "live-broadcast", "via": "live_matches table", "note": "App broadcasts (owner INSERT/UPDATE); web reads by room_code via realtime (public SELECT)."},
+      {"web_node": "db-live-matches", "app_node": "db-live-matches", "via": "same table", "note": "App writes room_code/score/rotation/stats_snapshot; web subscribes to UPDATE."},
+      {"web_node": "api-notify-reset", "app_node": "danger-zone", "via": "teams/lineups/players/data_backups recovery SQL", "note": "App reset triggers web email with recovery queries (30-day soft-delete window)."},
+      {"web_node": "legal-privacy", "app_node": "danger-zone", "via": "privacy/COPPA commitments", "note": "Web hosts the legal text the app links to; resolves part of app blocker R4 (entity now 'CourtOS LLC, California')."},
+      {"web_node": "subscription-terms", "app_node": "subscriptions", "via": "pricing/auto-renew", "note": "Same tiers: Free / Coach Premium $9.99 / Coach Advanced $19.99."},
+      {"web_node": "beta-signup", "app_node": "subscriptions", "via": "beta_signups table", "note": "Web-only acquisition table; funnels into app beta (TestFlight/Android)."}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "home-page", "name": "Landing page", "domain": "marketing", "type": "page", "route": "/",
+      "purpose": "The marketing home page. Composes 11 sections from Navbar through Footer.",
+      "files": ["app/page.tsx", "app/layout.tsx"],
+      "business_rules": ["Positioning: 'Your Entire Coaching Staff. One Tap.'", "Primary CTA everywhere = Join Beta (#beta)."],
+      "edges": {"renders": ["navbar", "hero", "no-assistant", "agitation", "app-tease", "feature-showcase", "features-section", "how-it-works", "beta-signup", "final-cta", "footer"]},
+      "doc": "knowledge/pages/landing.md"
+    },
+    {
+      "id": "root-layout", "name": "Root layout + metadata", "domain": "seo", "type": "infrastructure",
+      "purpose": "Global HTML shell: fonts (Inter body, Bebas Neue headlines), metadata, OpenGraph/Twitter, icons, theme color #0C0C0C.",
+      "files": ["app/layout.tsx"],
+      "business_rules": ["metadataBase https://courtos.co", "Title: 'CourtOS — Your Entire Coaching Staff. One Tap.'", "og-image /og-image.png 1200x630."],
+      "edges": {"renders": ["home-page"]},
+      "doc": "knowledge/seo/seo.md"
+    },
+    {
+      "id": "navbar", "name": "Navbar", "domain": "marketing", "type": "component",
+      "purpose": "Sticky scroll-reactive nav. Links: Features, How It Works, Academy(/blog), Beta. CTA Join Beta.",
+      "files": ["components/Navbar.tsx"],
+      "edges": {"links_to": ["feature-showcase", "how-it-works", "blog-index", "beta-signup"]},
+      "doc": "knowledge/components/README.md"
+    },
+    {"id": "hero", "name": "Hero", "domain": "marketing", "type": "component", "purpose": "Headline 'YOUR ENTIRE COACHING STAFF. IN ONE TAP.' + phone carousel + Get Early Access CTA.", "files": ["components/Hero.tsx", "components/HeroPhone.tsx"], "edges": {"links_to": ["beta-signup"], "uses": ["hero-phone"]}, "doc": "knowledge/components/README.md"},
+    {"id": "hero-phone", "name": "HeroPhone", "domain": "marketing", "type": "component", "purpose": "Animated phone frame cycling app-rally/heatmap/stats webp screens (3200ms).", "files": ["components/HeroPhone.tsx"], "edges": {}, "doc": "knowledge/components/README.md"},
+    {"id": "phone-mockup", "name": "PhoneMockup", "domain": "marketing", "type": "component", "purpose": "Interactive faux app UI (Match/Lineup/Stats/History tabs, court grid, point buttons).", "files": ["components/PhoneMockup.tsx"], "edges": {}, "doc": "knowledge/components/README.md"},
+    {"id": "no-assistant", "name": "NoAssistantNeeded", "domain": "marketing", "type": "component", "purpose": "4 cards: Scorekeeper / Rotation Tracker / Sub Coordinator / Stats Person — what CourtOS replaces.", "files": ["components/NoAssistantNeeded.tsx"], "edges": {}, "doc": "knowledge/components/README.md"},
+    {"id": "agitation", "name": "Agitation", "domain": "marketing", "type": "component", "purpose": "4 coach-pain testimonial cards ('COACHING ALONE IS HARD. WE KNOW.').", "files": ["components/Agitation.tsx"], "edges": {}, "doc": "knowledge/components/README.md"},
+    {"id": "app-tease", "name": "AppTease", "domain": "marketing", "type": "component", "purpose": "3 blurred 'BETA ACCESS ONLY' feature preview cards.", "files": ["components/AppTease.tsx"], "edges": {"links_to": ["beta-signup"]}, "doc": "knowledge/components/README.md"},
+    {"id": "feature-showcase", "name": "FeatureShowcase", "domain": "marketing", "type": "component", "purpose": "Interactive auto-cycling carousel (5 screens) anchored at #in-action.", "files": ["components/FeatureShowcase.tsx"], "anchor": "#in-action", "edges": {"links_to": ["beta-signup"]}, "doc": "knowledge/components/README.md"},
+    {"id": "features-section", "name": "FeaturesSection", "domain": "marketing", "type": "component", "purpose": "6-card feature grid (auto-rotation, smart subs, live stats, libero enforcement, history, live broadcast). Anchor #features.", "files": ["components/FeaturesSection.tsx"], "anchor": "#features", "edges": {}, "doc": "knowledge/components/README.md"},
+    {"id": "how-it-works", "name": "HowItWorks", "domain": "marketing", "type": "component", "purpose": "3-step timeline (Create Roster 2min / Build Lineup 30sec / Just Coach). Anchor #how-it-works.", "files": ["components/HowItWorks.tsx"], "anchor": "#how-it-works", "edges": {}, "doc": "knowledge/components/README.md"},
+    {"id": "final-cta", "name": "FinalCTA", "domain": "marketing", "type": "component", "purpose": "Closing conversion section repeating the headline + Get Early Access.", "files": ["components/FinalCTA.tsx"], "edges": {"links_to": ["beta-signup"]}, "doc": "knowledge/components/README.md"},
+    {"id": "footer", "name": "Footer", "domain": "marketing", "type": "component", "purpose": "Logo + Features/How It Works/Beta links + copyright.", "files": ["components/Footer.tsx"], "edges": {}, "doc": "knowledge/components/README.md"},
+    {"id": "social-proof", "name": "SocialProof (unused)", "domain": "marketing", "type": "component", "purpose": "Credibility cards + coach quote. NOT rendered on home page (available for future use).", "files": ["components/SocialProof.tsx"], "edges": {}, "doc": "knowledge/components/README.md"},
+    {
+      "id": "beta-signup", "name": "Beta Signup", "domain": "marketing", "type": "feature", "anchor": "#beta",
+      "purpose": "Beta waitlist form. Writes to Supabase beta_signups + calls notify-signup email route.",
+      "files": ["components/BetaSignup.tsx"],
+      "business_rules": [
+        "Fields: name*, email*, role* (head_coach/new_coach/parent_volunteer/athletic_director/player/just_interested), organization?, message?.",
+        "Inserts to beta_signups with source 'courtos.co/beta'.",
+        "Then POSTs /api/notify-signup. Success state offers Web Share.",
+        "Disclaimer: Free during beta · No credit card · No spam."
+      ],
+      "edges": {"writes": ["db-beta-signups"], "calls": ["api-notify-signup"]},
+      "doc": "knowledge/components/README.md"
+    },
+    {
+      "id": "live-viewer", "name": "Live Broadcast Viewer", "domain": "live", "type": "feature", "route": "/live",
+      "purpose": "Parents watch a live match by room code. Reads live_matches and subscribes to realtime UPDATEs.",
+      "files": ["app/live/LiveClient.tsx", "app/live/page.tsx"],
+      "business_rules": [
+        "Join via ?code= query param (sanitized, 6+ alphanumerics, displayed XXX-XXX).",
+        "Query: live_matches where room_code=clean AND is_active=true (.single()).",
+        "Realtime: supabase.channel postgres_changes UPDATE on live_matches filtered room_code.",
+        "States: enter / loading / watching / ended / error. No auth (room code = capability).",
+        "Displays: team/opponent names, score, set, sets won/lost, serving_us, current_rotation, court_mode, team + per-player stats_snapshot."
+      ],
+      "edges": {"reads": ["db-live-matches"], "depends_on": ["lib-supabase"]},
+      "doc": "knowledge/pages/live.md",
+      "cross_repo": ["live-broadcast (app)", "db-live-matches (app)"]
+    },
+    {
+      "id": "legal-privacy", "name": "Privacy Policy", "domain": "legal", "type": "page", "route": "/privacy",
+      "purpose": "Privacy policy. Effective 2026-06-14. COPPA, AI/Anthropic (no model training), retention, rights.",
+      "files": ["app/privacy/page.tsx", "components/LegalShell.tsx"],
+      "business_rules": ["Not directed to under-13; minor roster data = service-provider processing, no selling/ads.", "Contact support@courtos.co.", "No placeholders remaining."],
+      "edges": {"uses": ["legal-shell"]},
+      "doc": "knowledge/pages/legal.md",
+      "cross_repo": ["danger-zone (app)", "legal (app graph)"]
+    },
+    {
+      "id": "legal-terms", "name": "Terms of Service", "domain": "legal", "type": "page", "route": "/terms",
+      "purpose": "ToS. Effective 2026-06-14. Eligibility 13+, roster-data responsibility, AI accuracy disclaimer, liability cap (greater of 12-mo paid or US$50), governing law California.",
+      "files": ["app/terms/page.tsx", "components/LegalShell.tsx"],
+      "business_rules": ["Entity: CourtOS LLC, a California LLC.", "No placeholders remaining (resolves part of app blocker R4)."],
+      "edges": {"uses": ["legal-shell"]},
+      "doc": "knowledge/pages/legal.md"
+    },
+    {
+      "id": "subscription-terms", "name": "Subscription Terms", "domain": "legal", "type": "page", "route": "/subscription-terms",
+      "purpose": "Pricing + auto-renew + cancel/restore/refund. Free / Coach Premium $9.99 / Coach Advanced $19.99.",
+      "files": ["app/subscription-terms/page.tsx", "components/LegalShell.tsx"],
+      "business_rules": ["Auto-renew unless canceled >=24h before period end.", "Payments via app stores + RevenueCat; CourtOS stores no card data.", "Refunds per app-store policy."],
+      "edges": {"uses": ["legal-shell"]},
+      "doc": "knowledge/pages/legal.md",
+      "cross_repo": ["subscriptions (app)"]
+    },
+    {"id": "legal-shell", "name": "LegalShell", "domain": "legal", "type": "component", "purpose": "Shared legal-page layout (sticky header, 820px prose, footer with support email + cross-links). Brand bg #060b14.", "files": ["components/LegalShell.tsx"], "edges": {}, "doc": "knowledge/pages/legal.md"},
+    {
+      "id": "blog-index", "name": "Blog / Academy index", "domain": "seo", "type": "page", "route": "/blog",
+      "purpose": "CourtOS Academy — volleyball coaching guides. Lists posts (newest first).",
+      "files": ["app/blog/page.tsx", "app/blog/posts.ts"],
+      "edges": {"renders": ["blog-post"], "reads": ["blog-posts-data"]},
+      "doc": "knowledge/seo/blog.md"
+    },
+    {
+      "id": "blog-post", "name": "Blog post page", "domain": "seo", "type": "page", "route": "/blog/[slug]",
+      "purpose": "Static-generated article. Renders post.html via dangerouslySetInnerHTML; emits Article + Breadcrumb + FAQPage JSON-LD.",
+      "files": ["app/blog/[slug]/page.tsx", "app/blog/posts.ts"],
+      "business_rules": ["Posts are static HTML strings in posts.ts (no MDX).", "Weekly SEO task appends a BlogPost.", "Per-post canonical + OG article + Twitter card."],
+      "edges": {"reads": ["blog-posts-data"], "links_to": ["beta-signup"]},
+      "doc": "knowledge/seo/blog.md"
+    },
+    {"id": "blog-posts-data", "name": "posts.ts registry", "domain": "seo", "type": "data", "purpose": "Static BlogPost[] + getPost/getAllPosts. Current: 'how-to-track-a-6-2-rotation' (2026-06-17, 7min, 3 FAQs).", "files": ["app/blog/posts.ts"], "edges": {}, "doc": "knowledge/seo/blog.md"},
+    {
+      "id": "api-notify-signup", "name": "POST /api/notify-signup", "domain": "api", "type": "route",
+      "purpose": "Emails the team about a new beta signup; optionally emails the user a TestFlight/Android install link.",
+      "files": ["app/api/notify-signup/route.ts"],
+      "business_rules": ["Sends via Resend from hello@courtos.co; team copy to courtos@courtos.co.", "User welcome email only if TESTFLIGHT_LINK env set (+ ANDROID_TEST_LINK optional).", "Env: RESEND_API_KEY, TESTFLIGHT_LINK?, ANDROID_TEST_LINK?."],
+      "edges": {"calls": ["resend"]},
+      "doc": "knowledge/api/api.md"
+    },
+    {
+      "id": "api-notify-reset", "name": "POST /api/notify-reset", "domain": "api", "type": "route",
+      "purpose": "When a user resets/deletes data in the app, emails admin recovery SQL (teams/lineups/players/data_backups) for the 30-day window.",
+      "files": ["app/api/notify-reset/route.ts"],
+      "business_rules": ["Inputs: userId, userEmail, resetAt, kind (match_history|full reset).", "Sends to bentesoro1@gmail.com via Resend.", "Env: RESEND_API_KEY."],
+      "edges": {"calls": ["resend"]},
+      "doc": "knowledge/api/api.md",
+      "cross_repo": ["danger-zone (app)", "db-data-backups (app)"]
+    },
+    {
+      "id": "lib-supabase", "name": "lib/supabase.ts", "domain": "architecture", "type": "lib",
+      "purpose": "Browser Supabase client (anon key) with realtime 10 events/sec. Relies on RLS (public SELECT on live_matches).",
+      "files": ["lib/supabase.ts"],
+      "business_rules": ["Env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY.", "Anon only — no service role on the client."],
+      "edges": {"reads": ["db-live-matches"], "writes": ["db-beta-signups"]},
+      "doc": "knowledge/graph/architecture.md"
+    },
+    {"id": "db-live-matches", "name": "live_matches (shared table)", "domain": "database", "type": "table", "purpose": "Realtime broadcast row written by the app, read by the web /live viewer. Public SELECT, owner-scoped writes.", "files": ["app/live/LiveClient.tsx"], "business_rules": ["Fields: room_code, is_active, team_name, opponent_name, our_score, their_score, current_set, sets_won, sets_lost, serving_us, current_rotation, court_mode, stats_snapshot(jsonb), last_updated."], "edges": {}, "doc": "knowledge/graph/architecture.md", "cross_repo": ["db-live-matches (app)", "live-broadcast (app)"]},
+    {"id": "db-beta-signups", "name": "beta_signups (web-only table)", "domain": "database", "type": "table", "purpose": "Marketing waitlist captured by the web form.", "files": ["components/BetaSignup.tsx"], "business_rules": ["Fields: name, email, organization, coaching_level, frustration, source.", "Not present in the app graph (web-only)."], "edges": {}, "doc": "knowledge/graph/architecture.md"},
+    {"id": "resend", "name": "Resend (email service)", "domain": "architecture", "type": "service", "purpose": "Transactional email (signup notifications, install links, reset-recovery emails).", "files": ["app/api/notify-signup/route.ts", "app/api/notify-reset/route.ts"], "business_rules": ["From hello@courtos.co. Env RESEND_API_KEY."], "edges": {}, "doc": "knowledge/api/api.md"},
+    {"id": "seo-sitemap", "name": "sitemap.ts / robots.ts", "domain": "seo", "type": "infrastructure", "purpose": "Dynamic sitemap (home, blog, legal, per-post) + permissive robots + sitemap host.", "files": ["app/sitemap.ts", "app/robots.ts"], "edges": {"reads": ["blog-posts-data"]}, "doc": "knowledge/seo/seo.md"},
+    {"id": "seo-icon", "name": "icon.tsx / manifest", "domain": "seo", "type": "infrastructure", "purpose": "Dynamic favicon (ImageResponse, blue square 'C') + site.webmanifest + icon set.", "files": ["app/icon.tsx", "public/site.webmanifest"], "edges": {}, "doc": "knowledge/seo/seo.md"}
+  ],
+  "saved_queries": {
+    "how_does_the_live_viewer_work": ["live-viewer", "db-live-matches", "lib-supabase"],
+    "what_connects_web_to_the_app": ["live-viewer", "db-live-matches", "api-notify-reset", "subscription-terms", "legal-privacy", "beta-signup"],
+    "where_do_signups_go": ["beta-signup", "db-beta-signups", "api-notify-signup", "resend"],
+    "what_are_the_legal_pages": ["legal-privacy", "legal-terms", "subscription-terms", "legal-shell"],
+    "seo_surface": ["root-layout", "seo-sitemap", "seo-icon", "blog-index", "blog-post"],
+    "what_renders_on_home": ["home-page", "navbar", "hero", "no-assistant", "agitation", "app-tease", "feature-showcase", "features-section", "how-it-works", "beta-signup", "final-cta", "footer"]
+  }
+}

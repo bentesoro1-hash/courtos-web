@@ -42,10 +42,41 @@ interface LiveTeamLine {
   hittingPct: number | null
 }
 
+interface LiveCourtSlot {
+  pos: number
+  jersey: number
+  name: string
+  position: string
+}
+
+interface LiveRecentPlay {
+  label: string
+  player: string | null
+  us: boolean
+  our: number
+  their: number
+}
+
 interface LiveStatsSnapshot {
   updatedAt: string
   team: LiveTeamLine
   players: LivePlayerLine[]
+  court?: LiveCourtSlot[]
+  recentPlays?: LiveRecentPlay[]
+}
+
+// Role colors mirror the app's positionColors.ts (short labels).
+const POS_COLORS: Record<string, string> = {
+  S: '#EAB308',
+  OH: '#22C55E',
+  MB: '#3B82F6',
+  RS: '#F97316',
+  OPP: '#F97316',
+  L: '#8B5CF6',
+  DS: '#14B8A6',
+}
+function posColor(short: string): string {
+  return POS_COLORS[(short || '').toUpperCase()] ?? '#64748B'
 }
 
 interface LiveMatch {
@@ -73,6 +104,20 @@ function pctLabel(p: number | null): string {
 function ratingLabel(r: number | null): string {
   if (r == null) return '—'
   return r.toFixed(1)
+}
+
+function GaugeBar({ label, valueLabel, pct, color }: { label: string; valueLabel: string; pct: number; color: string }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between" style={{ marginBottom: '5px' }}>
+        <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+        <span className={BARLOW} style={{ fontSize: '15px', fontWeight: 900, color }}>{valueLabel}</span>
+      </div>
+      <div style={{ height: '8px', borderRadius: '4px', backgroundColor: '#1e293b', overflow: 'hidden' }}>
+        <div style={{ width: `${Math.round(Math.max(0, Math.min(1, pct)) * 100)}%`, height: '100%', backgroundColor: color, borderRadius: '4px', transition: 'width 0.4s ease' }} />
+      </div>
+    </div>
+  )
 }
 
 type PageState = 'enter' | 'loading' | 'watching' | 'ended' | 'error'
@@ -312,7 +357,6 @@ export default function LiveClient() {
     const borderColor = servingUs ? '#22c55e' : '#ef4444'
     const glowColor = servingUs ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'
     const timeLabel = timeAgoLabel(lastUpdated, now)
-    const hasSetsPlayed = matchData.sets_won > 0 || matchData.sets_lost > 0
     const homeName = matchData.team_name.slice(0, 13)
     const awayName = matchData.opponent_name.slice(0, 13)
 
@@ -471,70 +515,75 @@ export default function LiveClient() {
           </div>
         </div>
 
-        {/* Rotation info */}
+        {/* Rotation / sets / status strip */}
         <div
           className="flex justify-between items-center mx-4 mt-3 rounded-xl"
-          style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '12px 16px' }}
+          style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '10px 18px' }}
         >
-          <div>
-            <div
-              style={{
-                fontSize: '9px',
-                color: '#334155',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                marginBottom: '3px',
-              }}
-            >
-              ROTATION
-            </div>
-            <div className={BARLOW} style={{ fontSize: '26px', fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>
+          <div className="flex flex-col">
+            <div style={{ fontSize: '8px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Rotation</div>
+            <div className={BARLOW} style={{ fontSize: '22px', fontWeight: 900, color: '#f8fafc', lineHeight: 1.1 }}>
               R{matchData.current_rotation}
             </div>
           </div>
-
           <div className="flex flex-col items-center">
-            <div
-              style={{
-                fontSize: '9px',
-                color: '#334155',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                marginBottom: '3px',
-              }}
-            >
-              FORMATION
-            </div>
-            <div className={BARLOW} style={{ fontSize: '20px', fontWeight: 700, color: '#f8fafc', lineHeight: 1 }}>
-              {matchData.court_mode || '5-1'}
+            <div style={{ fontSize: '8px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sets</div>
+            <div className={BARLOW} style={{ fontSize: '18px', fontWeight: 700, color: '#f8fafc', lineHeight: 1.1 }}>
+              {matchData.sets_won}–{matchData.sets_lost}
             </div>
           </div>
-
           <div className="flex flex-col items-end">
-            <div
-              style={{
-                fontSize: '9px',
-                color: '#334155',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                marginBottom: '3px',
-              }}
-            >
-              STATUS
-            </div>
-            <div
-              className={BARLOW}
-              style={{
-                fontSize: '14px',
-                fontWeight: 700,
-                color: servingUs ? '#22c55e' : '#f59e0b',
-                lineHeight: 1,
-              }}
-            >
+            <div style={{ fontSize: '8px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Status</div>
+            <div className={BARLOW} style={{ fontSize: '14px', fontWeight: 700, color: servingUs ? '#22c55e' : '#f59e0b', lineHeight: 1.1 }}>
               {servingUs ? 'SERVING' : 'RECEIVING'}
             </div>
           </div>
         </div>
+
+        {/* ── Live court — role-colored rotation ── */}
+        {matchData.stats_snapshot?.court && matchData.stats_snapshot.court.length > 0 && (() => {
+          const byPos: Record<number, LiveCourtSlot> = {}
+          for (const s of matchData.stats_snapshot.court) byPos[s.pos] = s
+          const tok = (pos: number) => {
+            const s = byPos[pos]
+            if (!s) return <div key={pos} />
+            const c = posColor(s.position)
+            return (
+              <div key={pos} className="flex flex-col items-center" style={{ gap: '5px' }}>
+                <div
+                  className={BARLOW}
+                  style={{
+                    width: '52px', height: '52px', borderRadius: '999px',
+                    border: `2px solid ${c}`, backgroundColor: '#0b1120',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '21px', fontWeight: 900, color: '#f8fafc',
+                    boxShadow: `0 0 14px ${c}40`,
+                  }}
+                >
+                  {s.jersey}
+                </div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', lineHeight: 1 }}>{s.name}</div>
+                <div style={{ fontSize: '8px', fontWeight: 700, color: c, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  {s.position}
+                </div>
+              </div>
+            )
+          }
+          return (
+            <div className="mx-4 mt-3 rounded-xl" style={{ backgroundColor: '#070d1a', border: '1px solid #1e293b', padding: '16px 14px' }}>
+              <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', textAlign: 'center' }}>
+                On Court · {matchData.court_mode || '5-1'}
+              </div>
+              <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, #f59e0b, transparent)', margin: '0 4px 16px' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+                {tok(4)}{tok(3)}{tok(2)}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                {tok(5)}{tok(6)}{tok(1)}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Last updated */}
         {timeLabel && (
@@ -543,85 +592,75 @@ export default function LiveClient() {
           </p>
         )}
 
-        {/* Sets record card */}
-        {hasSetsPlayed && (
-          <div
-            className="mx-4 mt-3 rounded-xl"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '12px 16px' }}
-          >
-            <div
-              style={{
-                fontSize: '9px',
-                color: '#334155',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                marginBottom: '8px',
-              }}
-            >
-              SETS RECORD
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col items-center">
-                <div style={{ fontSize: '9px', color: '#475569', marginBottom: '2px' }}>WON</div>
-                <div
-                  className={BARLOW}
-                  style={{ fontSize: '32px', fontWeight: 900, color: '#22c55e', lineHeight: 1 }}
-                >
-                  {matchData.sets_won}
-                </div>
+        {/* ── Team stats — visual ── */}
+        {matchData.stats_snapshot && (() => {
+          const t = matchData.stats_snapshot.team
+          const totalErrors = t.serviceErrors + t.hittingErrors + t.passErrors
+          const ptsWon = Math.max(t.pointsWon, 1)
+          const segs = [
+            { label: 'Kills', value: t.kills, color: '#22c55e' },
+            { label: 'Aces', value: t.aces, color: '#EAB308' },
+            { label: 'Blocks', value: t.blocks, color: '#3B82F6' },
+            { label: 'Opp Err', value: t.oppErrors, color: '#64748b' },
+          ].filter((s) => s.value > 0)
+          return (
+            <div className="mx-4 mt-3 rounded-xl" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '16px' }}>
+              <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>
+                Team Stats
               </div>
-              <div style={{ fontSize: '20px', color: '#1e293b' }}>–</div>
-              <div className="flex flex-col items-center">
-                <div style={{ fontSize: '9px', color: '#475569', marginBottom: '2px' }}>LOST</div>
-                <div
-                  className={BARLOW}
-                  style={{ fontSize: '32px', fontWeight: 900, color: '#94a3b8', lineHeight: 1 }}
-                >
-                  {matchData.sets_lost}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* ── Team stats ── */}
-        {matchData.stats_snapshot && (
-          <div
-            className="mx-4 mt-3 rounded-xl"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '14px 16px' }}
-          >
-            <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>
-              TEAM STATS
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-              {[
-                { label: 'Kills', value: matchData.stats_snapshot.team.kills },
-                { label: 'Aces', value: matchData.stats_snapshot.team.aces },
-                { label: 'Blocks', value: matchData.stats_snapshot.team.blocks },
-                { label: 'Hit %', value: pctLabel(matchData.stats_snapshot.team.hittingPct) },
-                { label: 'Digs', value: matchData.stats_snapshot.team.digs },
-                { label: 'Passes', value: matchData.stats_snapshot.team.passes },
-                { label: 'Pass Avg', value: ratingLabel(matchData.stats_snapshot.team.passRating) },
-                {
-                  label: 'Errors',
-                  value:
-                    matchData.stats_snapshot.team.serviceErrors +
-                    matchData.stats_snapshot.team.hittingErrors +
-                    matchData.stats_snapshot.team.passErrors,
-                },
-              ].map((s) => (
-                <div key={s.label} style={{ textAlign: 'center' }}>
-                  <div className={BARLOW} style={{ fontSize: '22px', fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>
-                    {s.value}
+              {/* How we scored — stacked bar */}
+              {t.pointsWon > 0 && (
+                <>
+                  <div style={{ fontSize: '9px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '7px' }}>
+                    How we scored · {t.pointsWon} pts
                   </div>
-                  <div style={{ fontSize: '8px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px' }}>
-                    {s.label}
+                  <div style={{ display: 'flex', height: '14px', borderRadius: '7px', overflow: 'hidden', backgroundColor: '#1e293b', marginBottom: '8px' }}>
+                    {segs.map((s) => (
+                      <div key={s.label} style={{ width: `${(s.value / ptsWon) * 100}%`, backgroundColor: s.color }} />
+                    ))}
                   </div>
-                </div>
-              ))}
+                  <div className="flex flex-wrap" style={{ gap: '12px', marginBottom: '18px' }}>
+                    {segs.map((s) => (
+                      <div key={s.label} className="flex items-center" style={{ gap: '5px' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: s.color, display: 'inline-block' }} />
+                        <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                          {s.label} <span style={{ color: '#f8fafc', fontWeight: 700 }}>{s.value}</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Tiles */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '18px' }}>
+                {[
+                  { label: 'Kills', value: t.kills },
+                  { label: 'Aces', value: t.aces },
+                  { label: 'Blocks', value: t.blocks },
+                  { label: 'Digs', value: t.digs },
+                ].map((s) => (
+                  <div key={s.label} style={{ textAlign: 'center' }}>
+                    <div className={BARLOW} style={{ fontSize: '24px', fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>{s.value}</div>
+                    <div style={{ fontSize: '8px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px' }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Gauges */}
+              <GaugeBar label="Hitting %" valueLabel={pctLabel(t.hittingPct)} pct={t.hittingPct ?? 0} color="#22c55e" />
+              <div style={{ height: '12px' }} />
+              <GaugeBar label="Passing Avg (0–3)" valueLabel={ratingLabel(t.passRating)} pct={(t.passRating ?? 0) / 3} color="#8B5CF6" />
+
+              {/* Errors */}
+              <div className="flex items-center justify-between" style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #1e293b' }}>
+                <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Total Errors</span>
+                <span className={BARLOW} style={{ fontSize: '20px', fontWeight: 900, color: '#ef4444' }}>{totalErrors}</span>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* ── Players — tap to expand ── */}
         {matchData.stats_snapshot && matchData.stats_snapshot.players.length > 0 && (
@@ -634,13 +673,14 @@ export default function LiveClient() {
                 .sort((a, b) => b.points - a.points || a.jersey - b.jersey)
                 .map((p) => {
                   const open = expandedPlayer === p.id
+                  const c = posColor(p.position)
                   return (
                     <div
                       key={p.id}
                       onClick={() => setExpandedPlayer(open ? null : p.id)}
                       style={{
                         backgroundColor: '#0f172a',
-                        border: `1px solid ${open ? '#22c55e' : '#1e293b'}`,
+                        border: `1px solid ${open ? c : '#1e293b'}`,
                         borderRadius: '12px',
                         padding: '12px 14px',
                         cursor: 'pointer',
@@ -651,31 +691,32 @@ export default function LiveClient() {
                           <div
                             className={BARLOW}
                             style={{
-                              width: '34px',
-                              height: '34px',
+                              width: '36px',
+                              height: '36px',
                               borderRadius: '999px',
-                              border: '1.5px solid #22c55e',
+                              border: `2px solid ${c}`,
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
                               fontSize: '15px',
                               fontWeight: 900,
-                              color: '#22c55e',
+                              color: '#f8fafc',
                               flexShrink: 0,
+                              boxShadow: `0 0 10px ${c}33`,
                             }}
                           >
                             {p.jersey}
                           </div>
                           <div>
                             <div style={{ fontSize: '14px', fontWeight: 700, color: '#f8fafc' }}>{p.name}</div>
-                            <div style={{ fontSize: '10px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                            <div style={{ fontSize: '10px', color: c, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                               {p.position}
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center" style={{ gap: '14px' }}>
                           <div style={{ textAlign: 'right' }}>
-                            <div className={BARLOW} style={{ fontSize: '18px', fontWeight: 900, color: '#22c55e', lineHeight: 1 }}>
+                            <div className={BARLOW} style={{ fontSize: '18px', fontWeight: 900, color: c, lineHeight: 1 }}>
                               {p.points}
                             </div>
                             <div style={{ fontSize: '8px', color: '#475569', textTransform: 'uppercase' }}>Pts</div>
@@ -733,6 +774,35 @@ export default function LiveClient() {
                     </div>
                   )
                 })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Recent plays ── */}
+        {matchData.stats_snapshot?.recentPlays && matchData.stats_snapshot.recentPlays.length > 0 && (
+          <div className="mx-4 mt-3 mb-2">
+            <div style={{ fontSize: '9px', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', paddingLeft: '4px' }}>
+              Recent Plays
+            </div>
+            <div className="rounded-xl" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', overflow: 'hidden' }}>
+              {matchData.stats_snapshot.recentPlays.map((pl, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between"
+                  style={{ padding: '10px 14px', borderTop: i === 0 ? 'none' : '1px solid #161f30' }}
+                >
+                  <div className="flex items-center" style={{ gap: '10px' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '999px', backgroundColor: pl.us ? '#22c55e' : '#ef4444', display: 'inline-block', flexShrink: 0 }} />
+                    <div>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: pl.us ? '#e2e8f0' : '#94a3b8' }}>{pl.label}</span>
+                      {pl.player && <span style={{ fontSize: '12px', color: '#64748b' }}> · {pl.player}</span>}
+                    </div>
+                  </div>
+                  <span className={BARLOW} style={{ fontSize: '13px', fontWeight: 700, color: '#475569' }}>
+                    {pl.our}–{pl.their}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
