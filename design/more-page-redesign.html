@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<title>CourtOS · More — redesign options</title>
+<style>
+  :root{
+    --bg:#060b14;--card:#0f172a;--card2:#0b1322;--line:#1e293b;
+    --txt:#f8fafc;--txt2:#94a3b8;--txt3:#475569;--txt4:#334155;
+    --green:#22c55e;--blue:#3b82f6;--gold:#eab308;--red:#ef4444;--purple:#a855f7;--teal:#14b8a6;--orange:#f97316;
+    --head:"Barlow Condensed","Barlow",system-ui,sans-serif;--body:"Barlow",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:#05080f;color:var(--txt);display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:24px 12px 60px;}
+  .col{width:300px;}
+  .oh .n{font-family:var(--head);font-weight:900;font-size:12px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;}
+  .oh .t{font-family:var(--head);font-weight:800;font-size:17px;display:block;}
+  .note{font-size:11px;color:var(--txt2);line-height:1.45;margin:4px 2px 10px;}
+  .note b{color:var(--txt);font-weight:700;}
+  .phone{background:var(--bg);border:1px solid #11182a;border-radius:26px;overflow:hidden;padding:14px 12px 16px;}
+  .barlow{font-family:var(--head);}
+  .sec-l{font-size:9px;color:var(--txt4);text-transform:uppercase;letter-spacing:.14em;font-weight:800;margin:16px 4px 7px;}
+
+  /* profile bits */
+  .prof{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px;}
+  .av{width:46px;height:46px;border-radius:999px;background:#1e3a5f;display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:900;font-size:20px;color:#93c5fd;}
+  .pn{font-weight:800;font-size:15px;}
+  .pe{font-size:11px;color:var(--txt2);margin-top:1px;}
+  .tier{margin-left:auto;font-size:10px;font-weight:800;color:var(--green);background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:999px;padding:4px 10px;}
+  .logout{width:34px;height:34px;border-radius:9px;border:1px solid rgba(239,68,68,.4);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:15px;}
+
+  /* list rows */
+  .row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);padding:12px 13px;}
+  .row+.row{border-top:none;}
+  .grp{border-radius:14px;overflow:hidden;}
+  .grp .row{border-radius:0;}
+  .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .rt{flex:1;min-width:0;}
+  .rt .h{font-weight:700;font-size:14px;}
+  .rt .s{font-size:11px;color:var(--txt2);margin-top:1px;}
+  .chev{color:var(--txt3);font-size:16px;}
+  .prog{font-size:12px;font-weight:800;color:var(--green);}
+
+  /* tiles */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;min-height:92px;display:flex;flex-direction:column;justify-content:space-between;}
+  .tile .ic{width:36px;height:36px;}
+  .tile .h{font-weight:800;font-size:13px;margin-top:8px;}
+  .tile .s{font-size:10px;color:var(--txt3);margin-top:2px;line-height:1.3;}
+
+  /* hub */
+  .hub{background:linear-gradient(150deg,#10243a,#0c1626 60%);border:1px solid rgba(34,197,94,.35);border-radius:18px;padding:15px;}
+  .hubtop{display:flex;align-items:center;gap:11px;}
+  .ring{width:42px;height:42px;border-radius:999px;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:900;font-size:12px;color:var(--green);}
+  .cta{margin-top:12px;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.4);border-radius:10px;padding:9px;text-align:center;font-weight:800;font-size:12px;color:var(--green);}
+  .mini-list .row{background:transparent;border:none;border-bottom:1px solid var(--line);padding:11px 4px;}
+  .mini-list .row:last-child{border-bottom:none;}
+</style>
+</head>
+<body>
+
+<!-- A -->
+<div class="col">
+  <div class="oh"><span class="n">Option A</span><span class="t">Grouped List (iOS-style)</span></div>
+  <div class="note">Kills the giant logo. Compact profile, then <b>tight grouped sections</b> (Plan / Learn / Account) as clean rows with colored icon chips. Densest & most scannable — every option visible without scrolling far.</div>
+  <div class="phone">
+    <div class="prof"><div class="av">B</div><div><div class="pn">Ben Tesoro</div><div class="pe">bentesoro1@gmail.com</div></div><div class="logout">⎋</div></div>
+    <div style="text-align:center;margin-top:10px"><span class="tier">✓ CourtOS Club</span></div>
+
+    <div class="sec-l">Plan</div>
+    <div class="grp">
+      <div class="row"><div class="ic" style="background:rgba(34,197,94,.12);color:#22c55e">📅</div><div class="rt"><div class="h">Practices</div><div class="s">Schedule & add to calendar</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="ic" style="background:rgba(168,85,247,.12);color:#a855f7">✨</div><div class="rt"><div class="h">Generate Practice Plan</div><div class="s">AI drills from a match</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="ic" style="background:rgba(34,197,94,.12);color:#22c55e">⤴</div><div class="rt"><div class="h">Export Match Data</div><div class="s">CSV / PDF reports</div></div><span class="chev">›</span></div>
+    </div>
+
+    <div class="sec-l">Learn</div>
+    <div class="grp">
+      <div class="row"><div class="ic" style="background:rgba(34,197,94,.12);color:#22c55e">🎓</div><div class="rt"><div class="h">Volleyball Academy</div><div class="s">Positions, systems, subs</div></div><span class="prog">0%</span><span class="chev" style="margin-left:8px">›</span></div>
+    </div>
+
+    <div class="sec-l">Account</div>
+    <div class="grp">
+      <div class="row"><div class="ic" style="background:rgba(148,163,184,.12);color:#94a3b8">⚙️</div><div class="rt"><div class="h">Settings & Ruleset</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="ic" style="background:rgba(148,163,184,.12);color:#94a3b8">💬</div><div class="rt"><div class="h">Help & Feedback</div></div><span class="chev">›</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- B -->
+<div class="col">
+  <div class="oh"><span class="n">Option B</span><span class="t">Action Grid</span></div>
+  <div class="note">Most <b>visual</b>. The 4 things coaches actually tap become big colorful <b>tiles</b> (2×2), with the rest as a quiet list below. Fast, modern, app-store-ready.</div>
+  <div class="phone">
+    <div class="prof"><div class="av">B</div><div><div class="pn">Ben Tesoro</div><div class="pe">CourtOS Club</div></div><div class="logout">⎋</div></div>
+    <div class="sec-l">Quick actions</div>
+    <div class="tiles">
+      <div class="tile"><div class="ic" style="background:rgba(34,197,94,.12);color:#22c55e">📅</div><div><div class="h">Practices</div><div class="s">Schedule sessions</div></div></div>
+      <div class="tile" style="border-color:rgba(168,85,247,.35)"><div class="ic" style="background:rgba(168,85,247,.14);color:#a855f7">✨</div><div><div class="h">AI Practice Plan</div><div class="s">Drills from a match</div></div></div>
+      <div class="tile"><div class="ic" style="background:rgba(34,197,94,.12);color:#22c55e">⤴</div><div><div class="h">Export Data</div><div class="s">CSV / PDF</div></div></div>
+      <div class="tile"><div class="ic" style="background:rgba(234,179,8,.12);color:#eab308">🎓</div><div><div class="h">Academy</div><div class="s">0% complete</div></div></div>
+    </div>
+    <div class="sec-l">More</div>
+    <div class="grp">
+      <div class="row"><div class="ic" style="background:rgba(148,163,184,.12);color:#94a3b8">⚙️</div><div class="rt"><div class="h">Settings & Ruleset</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="ic" style="background:rgba(148,163,184,.12);color:#94a3b8">💬</div><div class="rt"><div class="h">Help & Feedback</div></div><span class="chev">›</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- C -->
+<div class="col">
+  <div class="oh"><span class="n">Option C</span><span class="t">Hub / Dashboard</span></div>
+  <div class="note">Premium feel. A <b>profile + plan hub</b> card up top (tier, manage CTA), the Academy <b>progress ring</b> surfaced, then quick tiles + a tidy settings list. Best "this is a paid product" vibe.</div>
+  <div class="phone">
+    <div class="hub">
+      <div class="hubtop"><div class="av">B</div><div style="flex:1"><div class="pn">Ben Tesoro</div><div class="pe">bentesoro1@gmail.com</div></div><div class="logout">⎋</div></div>
+      <div class="cta">✓ CourtOS Club · Manage plan</div>
+    </div>
+    <div class="sec-l">Keep learning</div>
+    <div class="row grp"><div class="ring">0%</div><div class="rt" style="margin-left:4px"><div class="h">Volleyball Academy</div><div class="s">Positions, systems, rotations & subs</div></div><span class="chev">›</span></div>
+    <div class="sec-l">Plan</div>
+    <div class="tiles">
+      <div class="tile"><div class="ic" style="background:rgba(34,197,94,.12);color:#22c55e">📅</div><div class="h">Practices</div></div>
+      <div class="tile" style="border-color:rgba(168,85,247,.35)"><div class="ic" style="background:rgba(168,85,247,.14);color:#a855f7">✨</div><div class="h">AI Plan</div></div>
+      <div class="tile"><div class="ic" style="background:rgba(34,197,94,.12);color:#22c55e">⤴</div><div class="h">Export</div></div>
+      <div class="tile"><div class="ic" style="background:rgba(148,163,184,.12);color:#94a3b8">⚙️</div><div class="h">Settings</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- D -->
+<div class="col">
+  <div class="oh"><span class="n">Option D</span><span class="t">Minimal Sectioned</span></div>
+  <div class="note">Ultra-clean. Tiny profile, then a single <b>borderless sectioned list</b> with hairline dividers — the calmest, most "system settings" look. Least visual flair, maximum clarity.</div>
+  <div class="phone">
+    <div style="display:flex;align-items:center;gap:11px;padding:4px 4px 14px;border-bottom:1px solid var(--line)">
+      <div class="av">B</div><div style="flex:1"><div class="pn">Ben Tesoro</div><div class="pe">CourtOS Club · Manage</div></div><div class="logout" style="border:none;color:#f87171">⎋</div>
+    </div>
+    <div class="sec-l">Plan</div>
+    <div class="mini-list">
+      <div class="row"><div class="ic" style="background:transparent;color:#22c55e">📅</div><div class="rt"><div class="h">Practices</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="ic" style="background:transparent;color:#a855f7">✨</div><div class="rt"><div class="h">Generate Practice Plan</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="ic" style="background:transparent;color:#22c55e">⤴</div><div class="rt"><div class="h">Export Match Data</div></div><span class="chev">›</span></div>
+    </div>
+    <div class="sec-l">Learn</div>
+    <div class="mini-list">
+      <div class="row"><div class="ic" style="background:transparent;color:#eab308">🎓</div><div class="rt"><div class="h">Volleyball Academy</div></div><span class="prog">0%</span><span class="chev" style="margin-left:8px">›</span></div>
+    </div>
+    <div class="sec-l">Account</div>
+    <div class="mini-list">
+      <div class="row"><div class="ic" style="background:transparent;color:#94a3b8">⚙️</div><div class="rt"><div class="h">Settings & Ruleset</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="ic" style="background:transparent;color:#94a3b8">💬</div><div class="rt"><div class="h">Help & Feedback</div></div><span class="chev">›</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

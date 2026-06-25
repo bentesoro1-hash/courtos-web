@@ -45,7 +45,7 @@ export default function TermsPage() {
 
       <h2>4. Subscriptions and payment</h2>
       <p>
-        CourtOS offers a free tier and paid subscriptions (Coach Premium and Coach Advanced). Paid subscriptions
+        CourtOS offers a free tier and an optional paid subscription (Pro). Paid subscriptions
         are billed through your app store account and auto-renew until canceled. Full pricing, renewal, and
         cancellation details are in our <a href="/subscription-terms">Subscription Terms</a>, which are part of
         these Terms.

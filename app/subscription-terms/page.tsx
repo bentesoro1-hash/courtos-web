@@ -11,23 +11,23 @@ export default function SubscriptionTermsPage() {
   return (
     <LegalShell title="Subscription Terms" effectiveDate="June 14, 2026">
       <p>
-        CourtOS offers a free tier plus two optional paid subscriptions. These Subscription Terms are part of our{' '}
-        <a href="/terms">Terms of Service</a> and explain pricing, billing, auto-renewal, and cancellation.
+        CourtOS offers a generous free tier plus one optional paid subscription, Pro, which includes a 14-day
+        free trial. These Subscription Terms are part of our <a href="/terms">Terms of Service</a> and explain
+        pricing, billing, auto-renewal, and cancellation.
       </p>
 
       <h2>Plans and pricing</h2>
       <ul>
         <li>
-          <strong>Free</strong> — $0. Live match tracking plus a per-match stats taster.
+          <strong>Free</strong> — $0. The full core tracking experience: run live matches with automatic rotation
+          tracking, manual substitutions, and timeouts; one team, roster, and lineup; unlimited saved matches; and
+          a live share link for parents.
         </li>
         <li>
-          <strong>Coach Premium</strong> — $9.99 per month. Full visual stats, heat/point map, rotation
-          analytics, advanced player stats, season trends, unlimited matches, multiple rosters and lineups, and
-          auto-sub rules.
-        </li>
-        <li>
-          <strong>Coach Advanced</strong> — $19.99 per month. Everything in Coach Premium plus AI features
-          (match summaries, stat captions, insights, and practice recommendations).
+          <strong>Pro</strong> — $9.99 per month or $79.99 per year. Everything in Free, plus stats and analytics,
+          heat maps, rotation analysis, performance summaries, data export (CSV and PDF), push notifications, AI
+          match summaries and practice plans, automatic libero / defensive-specialist / right-side substitution
+          alerts, and multiple teams, rosters, and lineups.
         </li>
       </ul>
       <p>

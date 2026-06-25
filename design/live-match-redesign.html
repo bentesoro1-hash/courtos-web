@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#060b14"/>
+<title>CourtOS · Live Match — redesign options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#060b14;--card:#0f172a;--card2:#0b1120;--line:#1e293b;
+    --txt:#f8fafc;--txt2:#94a3b8;--txt3:#475569;--txt4:#334155;
+    --green:#22c55e;--blue:#3b82f6;--gold:#eab308;--red:#ef4444;--purple:#8b5cf6;--orange:#f97316;
+    --head:"Barlow Condensed","Barlow",system-ui,sans-serif;--body:"Barlow",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:#05080f;color:var(--txt);display:flex;flex-wrap:wrap;gap:22px;justify-content:center;padding:24px 12px 60px;}
+  .col{width:300px;}
+  .opt-h{margin:0 2px 4px;}
+  .opt-h .n{font-family:var(--head);font-weight:900;font-size:12px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;}
+  .opt-h .t{font-family:var(--head);font-weight:800;font-size:17px;display:block;}
+  .note{font-size:11px;color:var(--txt2);line-height:1.45;margin:4px 2px 10px;}
+  .note b{color:var(--txt);font-weight:700;}
+  .phone{background:var(--bg);border:1px solid #11182a;border-radius:26px;overflow:hidden;}
+  .barlow{font-family:var(--head);}
+
+  /* compact scoreboard */
+  .sb{margin:10px;border-radius:14px;border:1.5px solid var(--green);background:linear-gradient(180deg,#0a1322,#070d1a);box-shadow:0 0 18px rgba(34,197,94,.14);}
+  .sb-row{display:flex;align-items:center;}
+  .sb-t{flex:1;text-align:center;padding:8px 4px 4px;}
+  .sb-t .nm{font-size:8px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;}
+  .sb-t .sc{font-family:var(--head);font-weight:900;font-size:38px;line-height:.9;}
+  .sb-c{width:42px;text-align:center;border-left:1px solid rgba(255,255,255,.05);border-right:1px solid rgba(255,255,255,.05);padding:6px 0;}
+  .sb-c .l{font-size:7px;color:var(--txt4);text-transform:uppercase;}
+  .sb-c .v{font-family:var(--head);font-weight:900;font-size:20px;line-height:1;}
+  .sb-serv{background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.05);padding:5px 12px;font-size:10px;color:var(--green);font-weight:700;letter-spacing:.03em;display:flex;align-items:center;gap:6px;}
+  .sb-serv .d{width:6px;height:6px;border-radius:999px;background:var(--green);}
+
+  /* chip row */
+  .chips{display:flex;gap:4px;padding:0 10px;margin:8px 0;overflow:hidden;}
+  .chip{font-family:var(--head);font-weight:800;font-size:10px;padding:5px 7px;border-radius:7px;background:#0b1322;border:1px solid var(--line);color:var(--txt3);}
+  .chip.live{color:var(--green);border-color:rgba(34,197,94,.5);}
+  .chip.cur{color:#fff;background:rgba(59,130,246,.2);border-color:var(--blue);}
+  .chip.srv{color:var(--green);border-color:rgba(34,197,94,.5);margin-left:auto;}
+
+  /* GRID court (A) */
+  .gcourt{margin:0 10px;background:radial-gradient(120% 80% at 50% 35%,#11253e,#0a1120);border:1px solid var(--line);border-radius:12px;padding:10px;}
+  .gnet{height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-bottom:9px;}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .tok{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;}
+  .disc{width:52px;height:52px;border-radius:999px;border:2.5px solid var(--txt3);background:#0b1120;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+  .disc .pos{position:absolute;top:-7px;font-size:7px;font-weight:800;background:#0b1120;border:1px solid;border-radius:999px;padding:1px 5px;}
+  .disc .num{font-family:var(--head);font-weight:900;font-size:20px;color:#fff;line-height:1;}
+  .tok .nm{font-size:9px;font-weight:700;color:#cbd5e1;}
+  .tok .pp{font-size:7px;font-weight:800;color:var(--txt2);background:#0b1322;border:1px solid var(--line);border-radius:5px;padding:0 4px;}
+  .serving .disc{box-shadow:0 0 0 3px rgba(234,179,8,.5),0 0 16px rgba(234,179,8,.5);border-color:var(--gold);}
+
+  /* tactical court (C) */
+  .tcourt{margin:0 10px;position:relative;height:230px;background:radial-gradient(120% 80% at 50% 35%,#11253e,#0a1120);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .tnet{position:absolute;left:6%;right:6%;top:9%;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .ttok{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;}
+  .tdisc{width:42px;height:42px;border-radius:999px;border:2px solid var(--txt3);background:#0b1120e6;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .tdisc .num{font-family:var(--head);font-weight:900;font-size:16px;color:#fff;line-height:1;}
+  .tdisc .pos{font-size:6.5px;font-weight:800;}
+  .ttok .nm{font-size:8px;font-weight:700;color:#cbd5e1;margin-top:1px;}
+
+  /* action docks */
+  .dock{margin:10px;}
+  .rally{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--gold);border-radius:14px;padding:15px;font-family:var(--head);font-weight:900;font-size:18px;color:var(--gold);letter-spacing:.04em;}
+  .minirow{display:flex;gap:8px;margin-top:8px;}
+  .mini{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 0;font-family:var(--head);font-weight:800;font-size:12px;color:var(--txt2);}
+  .mini .b{font-size:10px;background:#1e293b;border-radius:5px;padding:0 5px;color:var(--txt);}
+  /* won/lost split (B) */
+  .wl{display:flex;gap:9px;}
+  .wl button{flex:1;border-radius:16px;padding:20px 0;font-family:var(--head);font-weight:900;font-size:19px;letter-spacing:.03em;border:1.5px solid;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .wl .won{background:rgba(34,197,94,.14);border-color:var(--green);color:var(--green);}
+  .wl .lost{background:rgba(239,68,68,.12);border-color:var(--red);color:#f87171;}
+  .wl small{font-size:9px;font-weight:700;color:var(--txt3);letter-spacing:.06em;}
+  .smallcourt{transform:scale(.82);transform-origin:top center;}
+</style>
+</head>
+<body>
+
+<!-- OPTION A -->
+<div class="col">
+  <div class="opt-h"><span class="n">Option A</span><span class="t">Clean Grid Court</span></div>
+  <div class="note">Trades the overlapping tactical layout for a <b>2×3 grid</b> — six big, never-overlapping tokens, every name & number readable at a glance. The <b>#1 fix</b> for the overlap you're seeing. Tactical view stays as a toggle.</div>
+  <div class="phone">
+    <div class="sb">
+      <div class="sb-row">
+        <div class="sb-t"><div class="nm">Summer League</div><div class="sc" style="color:var(--green)">02</div></div>
+        <div class="sb-c"><div class="l">Set</div><div class="v">2</div></div>
+        <div class="sb-t"><div class="nm">Blue</div><div class="sc" style="color:var(--red)">00</div></div>
+      </div>
+      <div class="sb-serv"><span class="d"></span>SERVING · JASMINE #5</div>
+    </div>
+    <div class="chips"><span class="chip live">LIVE</span><span class="chip cur">R1</span><span class="chip">R2</span><span class="chip">R3</span><span class="chip srv">SERVE</span></div>
+    <div class="gcourt">
+      <div class="gnet"></div>
+      <div class="grid">
+        <div class="tok"><div class="disc" style="border-color:#22c55e"><span class="pos" style="color:#22c55e;border-color:#22c55e">OH</span><span class="num">1</span></div><span class="nm">Maddie</span><span class="pp">P4</span></div>
+        <div class="tok"><div class="disc" style="border-color:#3b82f6"><span class="pos" style="color:#3b82f6;border-color:#3b82f6">MB</span><span class="num">2</span></div><span class="nm">Ivy</span><span class="pp">P3</span></div>
+        <div class="tok"><div class="disc" style="border-color:#f97316"><span class="pos" style="color:#f97316;border-color:#f97316">RS</span><span class="num">9</span></div><span class="nm">Marina</span><span class="pp">P2</span></div>
+        <div class="tok"><div class="disc" style="border-color:#22c55e"><span class="pos" style="color:#22c55e;border-color:#22c55e">OH</span><span class="num">6</span></div><span class="nm">Mia</span><span class="pp">P5</span></div>
+        <div class="tok"><div class="disc" style="border-color:#8b5cf6"><span class="pos" style="color:#8b5cf6;border-color:#8b5cf6">L</span><span class="num">4</span></div><span class="nm">Ari</span><span class="pp">P6</span></div>
+        <div class="tok serving"><div class="disc"><span class="pos" style="color:#eab308;border-color:#eab308">S</span><span class="num">5</span></div><span class="nm">Jasmine</span><span class="pp">P1</span></div>
+      </div>
+    </div>
+    <div class="dock">
+      <div class="rally">▶ RALLY</div>
+      <div class="minirow"><div class="mini">⇄ SUBS<span class="b">15</span></div><div class="mini">⏱ TIMEOUT<span class="b">2</span></div><div class="mini">↩ UNDO</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION B -->
+<div class="col">
+  <div class="opt-h"><span class="n">Option B</span><span class="t">Action-First</span></div>
+  <div class="note">Court shrinks to a reference strip up top; the <b>point outcome becomes the hero</b> — huge thumb-sized <b>WON / LOST</b> targets at the bottom. Fastest possible scoring between rallies, one-handed. Best for speed.</div>
+  <div class="phone">
+    <div class="sb">
+      <div class="sb-row">
+        <div class="sb-t"><div class="nm">Summer League</div><div class="sc" style="color:var(--green)">02</div></div>
+        <div class="sb-c"><div class="l">Set</div><div class="v">2</div></div>
+        <div class="sb-t"><div class="nm">Blue</div><div class="sc" style="color:var(--red)">00</div></div>
+      </div>
+      <div class="sb-serv"><span class="d"></span>SERVING · JASMINE #5 · R1</div>
+    </div>
+    <div class="gcourt smallcourt">
+      <div class="gnet"></div>
+      <div class="grid">
+        <div class="tok"><div class="disc" style="border-color:#22c55e"><span class="num">1</span></div><span class="pp">P4</span></div>
+        <div class="tok"><div class="disc" style="border-color:#3b82f6"><span class="num">2</span></div><span class="pp">P3</span></div>
+        <div class="tok"><div class="disc" style="border-color:#f97316"><span class="num">9</span></div><span class="pp">P2</span></div>
+        <div class="tok"><div class="disc" style="border-color:#22c55e"><span class="num">6</span></div><span class="pp">P5</span></div>
+        <div class="tok"><div class="disc" style="border-color:#8b5cf6"><span class="num">4</span></div><span class="pp">P6</span></div>
+        <div class="tok serving"><div class="disc"><span class="num">5</span></div><span class="pp">P1</span></div>
+      </div>
+    </div>
+    <div class="dock" style="margin-top:18px">
+      <div class="wl">
+        <button class="won">✓ WON<small>we scored</small></button>
+        <button class="lost">✕ LOST<small>they scored</small></button>
+      </div>
+      <div class="minirow"><div class="mini">⇄ SUB</div><div class="mini">⏱ T.O.</div><div class="mini">↩ UNDO</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION C -->
+<div class="col">
+  <div class="opt-h"><span class="n">Option C</span><span class="t">Broadcast Tactical</span></div>
+  <div class="note">Keeps the <b>real serve-receive positions</b> (the tactical truth) but fixes legibility: smaller tokens, z-ordered so none hide behind another, names always clear, server glows. Premium TV feel + a slim action dock.</div>
+  <div class="phone">
+    <div class="sb">
+      <div class="sb-row">
+        <div class="sb-t"><div class="nm">Summer League</div><div class="sc" style="color:var(--green)">02</div></div>
+        <div class="sb-c"><div class="l">Set</div><div class="v">2</div></div>
+        <div class="sb-t"><div class="nm">Blue</div><div class="sc" style="color:var(--red)">00</div></div>
+      </div>
+      <div class="sb-serv"><span class="d"></span>SERVING · JASMINE #5</div>
+    </div>
+    <div class="chips"><span class="chip live">LIVE</span><span class="chip cur">R1</span><span class="chip">R2</span><span class="chip">R3</span><span class="chip srv">SERVE</span></div>
+    <div class="tcourt">
+      <div class="tnet"></div>
+      <div class="ttok" style="left:14%;top:24%;z-index:2"><div class="tdisc" style="border-color:#22c55e"><span class="num">1</span><span class="pos" style="color:#22c55e">OH</span></div><span class="nm">Maddie</span></div>
+      <div class="ttok" style="left:49%;top:22%;z-index:1"><div class="tdisc" style="border-color:#3b82f6"><span class="num">2</span><span class="pos" style="color:#3b82f6">MB</span></div><span class="nm">Ivy</span></div>
+      <div class="ttok" style="left:84%;top:26%;z-index:2"><div class="tdisc" style="border-color:#f97316"><span class="num">9</span><span class="pos" style="color:#f97316">RS</span></div><span class="nm">Marina</span></div>
+      <div class="ttok" style="left:20%;top:64%;z-index:3"><div class="tdisc" style="border-color:#22c55e"><span class="num">6</span><span class="pos" style="color:#22c55e">OH</span></div><span class="nm">Mia</span></div>
+      <div class="ttok" style="left:50%;top:78%;z-index:3"><div class="tdisc" style="border-color:#8b5cf6"><span class="num">4</span><span class="pos" style="color:#8b5cf6">L</span></div><span class="nm">Ari</span></div>
+      <div class="ttok serving" style="left:82%;top:70%;z-index:4"><div class="tdisc" style="border-color:#eab308;box-shadow:0 0 0 3px rgba(234,179,8,.5),0 0 14px rgba(234,179,8,.5)"><span class="num">5</span><span class="pos" style="color:#eab308">S</span></div><span class="nm">Jasmine</span></div>
+    </div>
+    <div class="dock">
+      <div class="rally">▶ RALLY</div>
+      <div class="minirow"><div class="mini">⇄ SUBS<span class="b">15</span></div><div class="mini">⏱ T.O.<span class="b">2</span></div><div class="mini">↩ UNDO</div></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

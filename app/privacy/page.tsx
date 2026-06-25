@@ -133,6 +133,14 @@ export default function PrivacyPage() {
         guardians may request access to, correction of, or deletion of their child&rsquo;s information through
         the same address.
       </p>
+      <p>
+        <strong>Live match sharing.</strong> CourtOS includes an optional &ldquo;live share&rdquo; feature a
+        coach can turn on during a match. When enabled, a real-time view of the scoreboard, rotation, and team
+        and per-player statistics is made available to anyone who has the short room link the coach chooses to
+        share. To protect minors, this public view identifies players by <strong>jersey number only</strong> —
+        it does not display players&rsquo; names. The coach controls when the broadcast starts and stops, and it
+        ends when the match is closed.
+      </p>
 
       <h2>7. Data retention</h2>
       <p>
@@ -158,6 +166,12 @@ export default function PrivacyPage() {
         behavioral advertising. To exercise any right, email{' '}
         <a href="mailto:support@courtos.co">support@courtos.co</a>. You can also manage subscriptions and many
         data items directly in the app or your app store account.
+      </p>
+      <p>
+        <strong>&ldquo;Do Not Track.&rdquo;</strong> Some browsers let you send a &ldquo;Do Not Track&rdquo;
+        (DNT) signal. Because we do not track you across third-party websites or services and do not use your
+        information for cross-context behavioral advertising, we do not change our practices in response to DNT
+        signals.
       </p>
 
       <h2>10. International users</h2>
