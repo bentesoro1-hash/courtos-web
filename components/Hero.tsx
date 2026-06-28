@@ -1,7 +1,13 @@
 'use client'
 import HeroPhone from './HeroPhone'
+import { HAS_INSTALL, INSTALL_URL } from '@/lib/links'
 
 export default function Hero() {
+  const primaryHref = HAS_INSTALL ? INSTALL_URL : '#beta'
+  const primaryLabel = HAS_INSTALL ? '📲 Install on iPhone' : 'Get Early Access →'
+  const primaryProps = HAS_INSTALL
+    ? { target: '_blank', rel: 'noopener noreferrer' }
+    : {}
   return (
     <section
       style={{
@@ -67,7 +73,8 @@ export default function Hero() {
 
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <a
-                href="#beta"
+                href={primaryHref}
+                {...primaryProps}
                 style={{
                   background: '#3DBE6B',
                   color: '#000',
@@ -90,10 +97,10 @@ export default function Hero() {
                   e.currentTarget.style.transform = 'translateY(0)'
                 }}
               >
-                Get Early Access →
+                {primaryLabel}
               </a>
               <a
-                href="#features"
+                href={HAS_INSTALL ? '#beta' : '#features'}
                 style={{
                   background: 'transparent',
                   color: '#888',
@@ -115,7 +122,7 @@ export default function Hero() {
                   e.currentTarget.style.borderColor = '#242424'
                 }}
               >
-                See Features
+                {HAS_INSTALL ? 'Get updates by email' : 'See Features'}
               </a>
             </div>
 

@@ -1,6 +1,7 @@
 'use client'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { HAS_INSTALL, INSTALL_URL } from '@/lib/links'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -128,9 +129,45 @@ export default function BetaSignup() {
           >
             YOU&apos;RE IN.
           </h2>
-          <p style={{ color: '#888', fontSize: 17, marginBottom: 32 }}>
-            We&apos;ll be in touch soon with your beta access details.
-          </p>
+
+          {HAS_INSTALL ? (
+            <>
+              <p style={{ color: '#888', fontSize: 17, marginBottom: 28 }}>
+                Tap below to install CourtOS now — we also emailed you the link.
+              </p>
+              <a
+                href={INSTALL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  background: '#3DBE6B',
+                  color: '#000',
+                  padding: '16px 40px',
+                  borderRadius: 8,
+                  fontSize: 15,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  textDecoration: 'none',
+                  marginBottom: 14,
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#4FD080')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#3DBE6B')}
+              >
+                📲 Install CourtOS
+              </a>
+              <p style={{ color: '#555', fontSize: 12, marginBottom: 32, maxWidth: 380, marginLeft: 'auto', marginRight: 'auto' }}>
+                First time? The link opens in Apple&apos;s free TestFlight app, then installs CourtOS inside it.
+              </p>
+            </>
+          ) : (
+            <p style={{ color: '#888', fontSize: 17, marginBottom: 32 }}>
+              Check your inbox — your beta install link is on its way.
+            </p>
+          )}
+
           <button
             onClick={handleShare}
             style={{

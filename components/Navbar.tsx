@@ -1,10 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { HAS_INSTALL, INSTALL_URL } from '@/lib/links'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+
+  const ctaHref = HAS_INSTALL ? INSTALL_URL : '#beta'
+  const ctaLabel = HAS_INSTALL ? 'Install App' : 'Join Beta'
+  const ctaProps = HAS_INSTALL ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -63,7 +68,8 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#beta"
+              href={ctaHref}
+              {...ctaProps}
               style={{
                 background: '#3DBE6B',
                 color: '#000',
@@ -85,14 +91,15 @@ export default function Navbar() {
                 e.currentTarget.style.transform = 'translateY(0)'
               }}
             >
-              Join Beta
+              {ctaLabel}
             </a>
           </div>
 
           {/* Mobile right side */}
           <div className="flex md:hidden" style={{ alignItems: 'center', gap: 12 }}>
             <a
-              href="#beta"
+              href={ctaHref}
+              {...ctaProps}
               style={{
                 background: '#3DBE6B',
                 color: '#000',
@@ -104,7 +111,7 @@ export default function Navbar() {
                 textDecoration: 'none',
               }}
             >
-              Join Beta
+              {ctaLabel}
             </a>
             <button
               onClick={() => setMenuOpen(!menuOpen)}

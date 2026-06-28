@@ -1,7 +1,11 @@
 'use client'
 import Image from 'next/image'
+import { HAS_INSTALL, INSTALL_URL } from '@/lib/links'
 
 export default function FinalCTA() {
+  const ctaHref = HAS_INSTALL ? INSTALL_URL : '#beta'
+  const ctaLabel = HAS_INSTALL ? '📲 Install the Beta' : 'Get Early Access →'
+  const ctaProps = HAS_INSTALL ? { target: '_blank', rel: 'noopener noreferrer' } : {}
   return (
     <section style={{ background: '#0C0C0C', padding: '120px 24px', textAlign: 'center', borderTop: '1px solid #1a1a1a', position: 'relative', overflow: 'hidden' }}>
       {/* Green glow */}
@@ -59,7 +63,8 @@ export default function FinalCTA() {
         </h2>
 
         <a
-          href="#beta"
+          href={ctaHref}
+          {...ctaProps}
           style={{
             display: 'inline-block',
             background: '#3DBE6B',
@@ -82,7 +87,7 @@ export default function FinalCTA() {
             e.currentTarget.style.transform = 'translateY(0)'
           }}
         >
-          Get Early Access →
+          {ctaLabel}
         </a>
 
         <p style={{ color: '#444', fontSize: 13, marginTop: 20 }}>
