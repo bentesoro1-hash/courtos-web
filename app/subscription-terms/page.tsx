@@ -98,6 +98,13 @@ export default function SubscriptionTermsPage() {
         after a change takes effect means you accept it.
       </p>
 
+      <h2>Governing entity</h2>
+      <p>
+        CourtOS is operated by <strong>CourtOS LLC</strong>, a California limited liability company. These
+        Subscription Terms are governed by the laws of the State of California, without regard to its conflict-of-laws
+        rules, and form part of our <a href="/terms">Terms of Service</a>.
+      </p>
+
       <h2>Contact</h2>
       <p>
         Questions about billing? Email <a href="mailto:support@courtos.co">support@courtos.co</a>.

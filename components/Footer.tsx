@@ -24,7 +24,7 @@ export default function Footer() {
         </a>
 
         <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
-          {[['#features', 'Features'], ['#how-it-works', 'How It Works'], ['#beta', 'Beta']].map(([href, label]) => (
+          {[['/#features', 'Features'], ['/#how-it-works', 'How It Works'], ['/#beta', 'Beta'], ['/privacy', 'Privacy'], ['/terms', 'Terms'], ['/subscription-terms', 'Subscription Terms']].map(([href, label]) => (
             <a
               key={href}
               href={href}

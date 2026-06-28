@@ -6,19 +6,25 @@ export async function POST(req: Request) {
   const body = await req.json();
 
   // 1) Notify the CourtOS team of the new signup.
-  await resend.emails.send({
-    from: 'CourtOS <hello@courtos.co>',
-    to: 'courtos@courtos.co',
-    subject: '🏐 New CourtOS Beta Signup!',
-    html: `
-      <h2>New Beta Signup</h2>
-      <p><strong>Name:</strong> ${body.name}</p>
-      <p><strong>Email:</strong> ${body.email}</p>
-      <p><strong>Club/Team:</strong> ${body.organization}</p>
-      <p><strong>Level:</strong> ${body.coaching_level}</p>
-      <p><strong>Notes:</strong> ${body.frustration}</p>
-    `,
-  });
+  //    Failure-isolated: the signup is already saved to Supabase before this API
+  //    is called, so a Resend hiccup must NOT surface an error to the tester.
+  try {
+    await resend.emails.send({
+      from: 'CourtOS <hello@courtos.co>',
+      to: 'courtos@courtos.co',
+      subject: '🏐 New CourtOS Beta Signup!',
+      html: `
+        <h2>New Beta Signup</h2>
+        <p><strong>Name:</strong> ${body.name}</p>
+        <p><strong>Email:</strong> ${body.email}</p>
+        <p><strong>Club/Team:</strong> ${body.organization}</p>
+        <p><strong>Level:</strong> ${body.coaching_level}</p>
+        <p><strong>Notes:</strong> ${body.frustration}</p>
+      `,
+    });
+  } catch {
+    // Team notification is best-effort — never fail the signup over it.
+  }
 
   // 2) Auto-send the tester their download link — only once TESTFLIGHT_LINK is set.
   //    Set TESTFLIGHT_LINK in Vercel env vars the day your public link is live;
