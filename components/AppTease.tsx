@@ -129,8 +129,7 @@ export default function AppTease() {
                     textTransform: 'uppercase', textDecoration: 'none',
                     letterSpacing: '0.05em',
                   }}
-                >
-                  Unlock Access
+                >Unlock Access
                 </a>
               </div>
             </div>
