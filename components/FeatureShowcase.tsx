@@ -6,28 +6,28 @@ import Image from 'next/image'
 const SCREENS = [
   {
     src: '/images/app-rally.webp',
-    title: 'Live Rotation Tracking',
-    desc: 'See every player on the court in real time. Rotations advance automatically on every side-out.',
+    title: 'Live Rotation View',
+    desc: 'See every player on the court in real time. Tap RALLY to score — rotation advances automatically.',
   },
   {
     src: '/images/app-rotations.webp',
-    title: 'Scoring & Team Stats',
-    desc: 'Kills, aces, blocks, and errors tracked live. See your scoring breakdown at a glance every set.',
+    title: 'Lineup Creation',
+    desc: 'Build your 5-1, 6-2, or 4-2 lineup visually. CourtOS validates it before the set starts.',
   },
   {
     src: '/images/app-logging.webp',
-    title: 'Full Team Stats Dashboard',
-    desc: 'Match stats, top performers, and scoring summary — all auto-generated after every set.',
+    title: 'Smart Auto-Subs',
+    desc: 'CourtOS suggests the right sub at the right time. One tap to confirm — no counting rotations.',
   },
   {
     src: '/images/app-heatmap.webp',
-    title: 'Player Performance Cards',
-    desc: 'Know who is Playing Well and who needs a sub — ranked by impact, updated live.',
+    title: 'Team Stats Live',
+    desc: 'Match stats, top performers, and player form scores updated after every single point.',
   },
   {
     src: '/images/app-stats.webp',
-    title: 'Player Stats Detail',
-    desc: 'Individual kill %, passing average, serve %, and form score per player per match.',
+    title: 'Playing Time & Point Log',
+    desc: 'Track rotations on court per player and see every point logged in order.',
   },
 ]
 
