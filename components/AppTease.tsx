@@ -2,31 +2,19 @@
 
 const PREVIEWS = [
   {
-    title: 'Live Rotation Tracker',
-    desc: 'Full 5-1 court view with real-time player positions',
-    accent: '#3DBE6B',
-    grid: [
-      ['MB', 'OH', 'OPP'],
-      ['L', 'S', 'OH'],
-    ],
-  },
-  {
-    title: 'Smart Substitutions',
-    desc: 'Rules-based alerts with one-tap confirmation',
-    accent: '#3DBE6B',
-    grid: [
-      ['SUB ALERT', '—'],
-      ['Confirm', 'Skip'],
-    ],
+    title: 'Live Match Tracking',
+    desc: 'Real-time score, rotation view, and one-tap point tracking',
+    img: '/images/screen-match.png',
   },
   {
     title: 'Player Stats Dashboard',
-    desc: 'K / A / E / ACE / DIG tracked live per player',
-    accent: '#3DBE6B',
-    grid: [
-      ['Johnson', '4K', '1A'],
-      ['Williams', '2K', '8A'],
-    ],
+    desc: 'Kills, aces, errors, and form score tracked live per player',
+    img: '/images/screen-stats.png',
+  },
+  {
+    title: 'Attack Heat Map',
+    desc: 'See exactly where your team wins points — by zone and rotation',
+    img: '/images/screen-heatmap.png',
   },
 ]
 
@@ -71,6 +59,7 @@ export default function AppTease() {
                 overflow: 'hidden',
                 position: 'relative',
                 transition: 'all 0.25s ease',
+                minHeight: 360,
               }}
               onMouseEnter={e => {
                 const el = e.currentTarget
@@ -85,67 +74,53 @@ export default function AppTease() {
                 el.style.boxShadow = 'none'
               }}
             >
-              {/* Blurred preview content */}
-              <div style={{ padding: 24, filter: 'blur(6px)', userSelect: 'none', pointerEvents: 'none' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <div style={{ width: 80, height: 10, background: '#2a2a2a', borderRadius: 4 }} />
-                  <div style={{ width: 40, height: 10, background: '#1e3828', borderRadius: 4 }} />
-                </div>
-                <div style={{
-                  background: '#0d0d0d', borderRadius: 10, overflow: 'hidden',
-                  border: '1px solid #1e1e1e', marginBottom: 12,
-                }}>
-                  {preview.grid.map((row, ri) => (
-                    <div key={ri} style={{
-                      display: 'grid',
-                      gridTemplateColumns: `repeat(${row.length}, 1fr)`,
-                      borderBottom: ri < preview.grid.length - 1 ? '1px solid #1a1a1a' : 'none',
-                    }}>
-                      {row.map((cell, ci) => (
-                        <div key={ci} style={{
-                          padding: '12px 10px',
-                          borderRight: ci < row.length - 1 ? '1px solid #1a1a1a' : 'none',
-                          fontSize: 11, color: '#666', fontWeight: 700,
-                          textAlign: 'center',
-                        }}>
-                          {cell}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  {[60, 45, 75].map((w, i) => (
-                    <div key={i} style={{ width: w, height: 8, background: '#1e1e1e', borderRadius: 3 }} />
-                  ))}
-                </div>
+              {/* Real screenshot — blurred */}
+              <div style={{
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                inset: 0,
+                filter: 'blur(3px)',
+                transform: 'scale(1.04)',
+                overflow: 'hidden',
+              }}>
+                <img
+                  src={preview.img}
+                  alt={preview.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top center',
+                    display: 'block',
+                  }}
+                />
               </div>
 
               {/* Frosted overlay */}
               <div style={{
                 position: 'absolute', inset: 0,
                 display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(12,12,12,0.6)',
-                backdropFilter: 'blur(2px)',
-                padding: 24,
+                alignItems: 'center', justifyContent: 'flex-end',
+                background: 'linear-gradient(to bottom, rgba(12,12,12,0.1) 0%, rgba(12,12,12,0.5) 40%, rgba(12,12,12,0.95) 100%)',
+                padding: 28,
               }}>
                 <div style={{
                   background: 'rgba(61,190,107,0.1)',
                   border: '1px solid rgba(61,190,107,0.3)',
-                  borderRadius: 8, padding: '6px 14px', marginBottom: 16,
+                  borderRadius: 8, padding: '5px 12px', marginBottom: 12,
                 }}>
                   <span style={{ color: '#3DBE6B', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em' }}>
                     BETA ACCESS ONLY
                   </span>
                 </div>
-                <h3 style={{ color: '#F0F0F0', fontSize: 18, fontWeight: 700, textAlign: 'center', marginBottom: 8 }}>
+                <h3 style={{ color: '#F0F0F0', fontSize: 18, fontWeight: 700, textAlign: 'center', marginBottom: 6 }}>
                   {preview.title}
                 </h3>
-                <p style={{ color: '#666', fontSize: 13, textAlign: 'center', marginBottom: 20 }}>
+                <p style={{ color: '#888', fontSize: 13, textAlign: 'center', marginBottom: 20, lineHeight: 1.5 }}>
                   {preview.desc}
                 </p>
-                <a
+                
                   href="#beta"
                   style={{
                     background: '#3DBE6B', color: '#000',
