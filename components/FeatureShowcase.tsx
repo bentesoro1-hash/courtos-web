@@ -6,28 +6,28 @@ import Image from 'next/image'
 const SCREENS = [
   {
     src: '/images/app-rally.webp',
-    title: 'Score the rally',
-    desc: 'Tap once — the point is scored, the rotation moves, and the stat is logged automatically.',
+    title: 'Live Rotation Tracking',
+    desc: 'See every player on the court in real time. Rotations advance automatically on every side-out.',
   },
   {
     src: '/images/app-rotations.webp',
-    title: 'Track every rotation',
-    desc: "See who's where on every serve. Auto-subs handle the libero and DS swaps for you.",
+    title: 'Scoring & Team Stats',
+    desc: 'Kills, aces, blocks, and errors tracked live. See your scoring breakdown at a glance every set.',
   },
   {
     src: '/images/app-logging.webp',
-    title: 'Log it in one tap',
-    desc: 'Kill, ace, block, opponent error — record what happened in a single tap.',
+    title: 'Full Team Stats Dashboard',
+    desc: 'Match stats, top performers, and scoring summary — all auto-generated after every set.',
   },
   {
     src: '/images/app-heatmap.webp',
-    title: 'See where you win',
-    desc: 'Real attack heat maps show exactly where your team scores and struggles.',
+    title: 'Player Performance Cards',
+    desc: 'Know who is Playing Well and who needs a sub — ranked by impact, updated live.',
   },
   {
     src: '/images/app-stats.webp',
-    title: "Know who's hot",
-    desc: 'Live hitting %, kills and passing per player — no spreadsheet, no stat crew.',
+    title: 'Player Stats Detail',
+    desc: 'Individual kill %, passing average, serve %, and form score per player per match.',
   },
 ]
 
