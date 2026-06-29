@@ -7,9 +7,9 @@ const PREVIEWS = [
     img: '/images/screen-match.png',
   },
   {
-    title: 'Player Stats Dashboard',
-    desc: 'Kills, aces, errors, and form score tracked live per player',
-    img: '/images/screen-stats.png',
+    title: 'Player Performance Cards',
+    desc: 'See who is Playing Well, Solid, or needs a sub — live every set',
+    img: '/images/screen-players.png',
   },
   {
     title: 'Attack Heat Map',
@@ -38,11 +38,11 @@ export default function AppTease() {
           {PREVIEWS.map((preview) => (
             <div
               key={preview.title}
-              style={{ background: '#141414', border: '1px solid #242424', borderRadius: 16, overflow: 'hidden', position: 'relative', transition: 'all 0.25s ease', minHeight: 360 }}
+              style={{ background: '#141414', border: '1px solid #242424', borderRadius: 16, overflow: 'hidden', position: 'relative', transition: 'all 0.25s ease', minHeight: 400 }}
               onMouseEnter={e => { const el = e.currentTarget; el.style.transform = 'translateY(-4px)'; el.style.borderColor = '#3DBE6B'; el.style.boxShadow = '0 0 24px rgba(61,190,107,0.15)' }}
               onMouseLeave={e => { const el = e.currentTarget; el.style.transform = 'translateY(0)'; el.style.borderColor = '#242424'; el.style.boxShadow = 'none' }}
             >
-              <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, filter: 'blur(3px)', transform: 'scale(1.04)', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', inset: 0, filter: 'blur(3px)', transform: 'scale(1.04)', overflow: 'hidden' }}>
                 <img src={preview.img} alt={preview.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }} />
               </div>
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', background: 'linear-gradient(to bottom, rgba(12,12,12,0.1) 0%, rgba(12,12,12,0.5) 40%, rgba(12,12,12,0.95) 100%)', padding: 28 }}>
