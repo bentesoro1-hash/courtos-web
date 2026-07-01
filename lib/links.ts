@@ -17,13 +17,30 @@
 // ════════════════════════════════════════════════════════════════════════
 
 export const TESTFLIGHT_URL = (process.env.NEXT_PUBLIC_TESTFLIGHT_URL || '').trim()
+
+// Android has two phases:
+//  • CLOSED beta — set NEXT_PUBLIC_ANDROID_SIGNUP="true". Google requires each
+//    tester's email to be authorized, so the Android CTA routes to the signup
+//    form; the welcome email delivers the join + install steps.
+//  • OPEN testing (public link, after the 14-day closed test) — set
+//    NEXT_PUBLIC_ANDROID_URL to the public Play opt-in link. The CTA then becomes
+//    a true one-tap install like iOS. (A direct URL takes precedence over signup.)
 export const ANDROID_URL = (process.env.NEXT_PUBLIC_ANDROID_URL || '').trim()
+export const ANDROID_SIGNUP = (process.env.NEXT_PUBLIC_ANDROID_SIGNUP || '').trim() === 'true'
 
 /** True once a public install link exists — flips every CTA to direct-install. */
 export const HAS_INSTALL = TESTFLIGHT_URL.length > 0
 
-/** True once a public Android testing link exists — shows the Android CTA. */
-export const HAS_ANDROID = ANDROID_URL.length > 0
+/** A direct Play link exists (open testing) — the Android CTA installs directly. */
+export const ANDROID_IS_DIRECT = ANDROID_URL.length > 0
+
+/** Show an Android CTA at all (either a direct link or the closed-beta signup). */
+export const HAS_ANDROID = ANDROID_IS_DIRECT || ANDROID_SIGNUP
+
+/** Where the Android CTA points: the Play link if we have it, else the signup form. */
+export const ANDROID_CTA_HREF = ANDROID_URL || '#beta'
+/** Label reflects the mode: direct install vs. request-an-invite. */
+export const ANDROID_CTA_LABEL = ANDROID_IS_DIRECT ? '🤖 Install on Android' : '🤖 Get the Android beta'
 
 /** Best primary install target (iPhone first; this is an iOS-first launch). */
 export const INSTALL_URL = TESTFLIGHT_URL || ANDROID_URL

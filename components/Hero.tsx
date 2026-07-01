@@ -1,6 +1,6 @@
 'use client'
 import HeroPhone from './HeroPhone'
-import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_URL } from '@/lib/links'
+import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_CTA_HREF, ANDROID_CTA_LABEL, ANDROID_IS_DIRECT } from '@/lib/links'
 
 export default function Hero() {
   const primaryHref = HAS_INSTALL ? INSTALL_URL : '#beta'
@@ -36,7 +36,7 @@ export default function Hero() {
               >{HAS_INSTALL ? 'Get updates by email' : 'See It In Action'}</a>
             </div>
             {HAS_ANDROID && (
-              <a href={ANDROID_URL} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 18, color: '#3DBE6B', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>🤖 Also on Android →</a>
+              <a href={ANDROID_CTA_HREF} {...(ANDROID_IS_DIRECT ? { target: '_blank', rel: 'noopener noreferrer' } : {})} style={{ display: 'inline-block', marginTop: 18, color: '#3DBE6B', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{ANDROID_CTA_LABEL} →</a>
             )}
             <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{ display: 'flex' }}>

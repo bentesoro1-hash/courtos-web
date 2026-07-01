@@ -1,7 +1,7 @@
 'use client'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_URL } from '@/lib/links'
+import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_URL, ANDROID_IS_DIRECT, ANDROID_SIGNUP } from '@/lib/links'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -160,7 +160,7 @@ export default function BetaSignup() {
                     📲 Install on iPhone
                   </a>
                 )}
-                {HAS_ANDROID && (
+                {ANDROID_IS_DIRECT && (
                   <a
                     href={ANDROID_URL}
                     target="_blank"
@@ -186,6 +186,11 @@ export default function BetaSignup() {
               <p style={{ color: '#555', fontSize: 12, marginBottom: 32, maxWidth: 380, marginLeft: 'auto', marginRight: 'auto' }}>
                 {HAS_INSTALL ? 'First time on iPhone? The link opens in Apple’s free TestFlight app, then installs CourtOS inside it.' : 'Tap to install CourtOS on your device.'}
               </p>
+              {ANDROID_SIGNUP && !ANDROID_IS_DIRECT && (
+                <p style={{ color: '#3DBE6B', fontSize: 13, fontWeight: 600, marginBottom: 28 }}>
+                  🤖 On Android? Your beta invite steps are on the way by email.
+                </p>
+              )}
             </>
           ) : (
             <p style={{ color: '#888', fontSize: 17, marginBottom: 32 }}>
