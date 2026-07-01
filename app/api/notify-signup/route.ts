@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   const testflightLink = process.env.TESTFLIGHT_LINK;
   const androidLink = process.env.ANDROID_TEST_LINK;
 
-  if (testflightLink && body.email) {
+  if ((testflightLink || androidLink) && body.email) {
     const firstName = (body.name || '').trim().split(/\s+/)[0] || 'Coach';
     const button = (href: string, label: string) => `
       <a href="${href}" style="display:inline-block;background:#3DBE6B;color:#000;
@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         padding:14px 26px;border-radius:8px;text-decoration:none;font-size:15px;margin:6px 0;">
         ${label}
       </a>`;
+    const note = 'margin:14px 0 4px;color:#666;font-size:13px;';
 
     try {
       await resend.emails.send({
@@ -51,14 +52,22 @@ export async function POST(req: Request) {
             max-width:520px;margin:0 auto;color:#1a1a1a;line-height:1.6;">
             <h2 style="margin:0 0 6px;">Welcome to the CourtOS beta, ${firstName}!</h2>
             <p style="margin:0 0 18px;color:#444;">
-              Your entire coaching staff, in one tap. Tap below to install CourtOS on your phone
+              Your entire coaching staff, in one tap. Install CourtOS on your phone
               and start running matches from the sideline.
             </p>
-            <p style="margin:0 0 6px;">${button(testflightLink, 'Install on iPhone (TestFlight)')}</p>
+            ${testflightLink ? `<p style="margin:0 0 6px;">${button(testflightLink, 'Install on iPhone (TestFlight)')}</p>` : ''}
             ${androidLink ? `<p style="margin:0 0 6px;">${button(androidLink, 'Install on Android')}</p>` : ''}
-            <p style="margin:18px 0 6px;color:#666;font-size:13px;">
+            ${testflightLink ? `<p style="${note}">
               On iPhone you'll first install Apple's free <strong>TestFlight</strong> app, then the link
-              opens CourtOS inside it. Reply to this email if anything gives you trouble — we read every message.
+              opens CourtOS inside it.
+            </p>` : ''}
+            ${androidLink ? `<p style="${note}">
+              On Android, make sure you signed up with the <strong>Google account email on your phone</strong> —
+              that's how we grant beta access. We're adding you now; if the button says "not a tester" yet,
+              give it a few hours and tap it again.
+            </p>` : ''}
+            <p style="margin:14px 0 6px;color:#666;font-size:13px;">
+              Reply to this email if anything gives you trouble — we read every message.
             </p>
             <p style="margin:14px 0 0;color:#888;font-size:12px;">— The CourtOS team · OPERATE. COACH. WIN.</p>
           </div>
