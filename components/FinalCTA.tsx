@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import { HAS_INSTALL, INSTALL_URL } from '@/lib/links'
+import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_URL } from '@/lib/links'
 
 export default function FinalCTA() {
   const ctaHref = HAS_INSTALL ? INSTALL_URL : '#beta'
@@ -19,6 +19,11 @@ export default function FinalCTA() {
           onMouseEnter={e => { e.currentTarget.style.background = '#4FD080'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 0 60px rgba(61,190,107,0.6)' }}
           onMouseLeave={e => { e.currentTarget.style.background = '#3DBE6B'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 0 40px rgba(61,190,107,0.4)' }}
         >{ctaLabel}</a>
+        {HAS_ANDROID && (
+          <div style={{ marginTop: 18 }}>
+            <a href={ANDROID_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#3DBE6B', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>🤖 Also on Android →</a>
+          </div>
+        )}
         <p style={{ color: '#666', fontSize: 13, marginTop: 20 }}>Free during beta · No credit card required</p>
       </div>
     </section>

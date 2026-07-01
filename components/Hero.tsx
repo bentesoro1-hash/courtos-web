@@ -1,6 +1,6 @@
 'use client'
 import HeroPhone from './HeroPhone'
-import { HAS_INSTALL, INSTALL_URL } from '@/lib/links'
+import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_URL } from '@/lib/links'
 
 export default function Hero() {
   const primaryHref = HAS_INSTALL ? INSTALL_URL : '#beta'
@@ -35,6 +35,9 @@ export default function Hero() {
                 onMouseLeave={e => { e.currentTarget.style.color = '#C0C0C0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
               >{HAS_INSTALL ? 'Get updates by email' : 'See It In Action'}</a>
             </div>
+            {HAS_ANDROID && (
+              <a href={ANDROID_URL} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 18, color: '#3DBE6B', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>🤖 Also on Android →</a>
+            )}
             <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{ display: 'flex' }}>
                 {['C', 'K', 'M', 'J', 'R'].map((initial, i) => (

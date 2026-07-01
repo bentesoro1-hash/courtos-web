@@ -1,7 +1,7 @@
 'use client'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { HAS_INSTALL, INSTALL_URL } from '@/lib/links'
+import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_URL } from '@/lib/links'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -130,36 +130,61 @@ export default function BetaSignup() {
             YOU&apos;RE IN.
           </h2>
 
-          {HAS_INSTALL ? (
+          {(HAS_INSTALL || HAS_ANDROID) ? (
             <>
               <p style={{ color: '#888', fontSize: 17, marginBottom: 28 }}>
                 Tap below to install CourtOS now — we also emailed you the link.
               </p>
-              <a
-                href={INSTALL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-block',
-                  background: '#3DBE6B',
-                  color: '#000',
-                  padding: '16px 40px',
-                  borderRadius: 8,
-                  fontSize: 15,
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  textDecoration: 'none',
-                  marginBottom: 14,
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#4FD080')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#3DBE6B')}
-              >
-                📲 Install CourtOS
-              </a>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
+                {HAS_INSTALL && (
+                  <a
+                    href={INSTALL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block',
+                      background: '#3DBE6B',
+                      color: '#000',
+                      padding: '16px 32px',
+                      borderRadius: 8,
+                      fontSize: 15,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#4FD080')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '#3DBE6B')}
+                  >
+                    📲 Install on iPhone
+                  </a>
+                )}
+                {HAS_ANDROID && (
+                  <a
+                    href={ANDROID_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block',
+                      background: '#1a1a1a',
+                      color: '#F0F0F0',
+                      border: '1px solid #3DBE6B',
+                      padding: '16px 32px',
+                      borderRadius: 8,
+                      fontSize: 15,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    🤖 Install on Android
+                  </a>
+                )}
+              </div>
               <p style={{ color: '#555', fontSize: 12, marginBottom: 32, maxWidth: 380, marginLeft: 'auto', marginRight: 'auto' }}>
-                First time? The link opens in Apple&apos;s free TestFlight app, then installs CourtOS inside it.
+                {HAS_INSTALL ? 'First time on iPhone? The link opens in Apple’s free TestFlight app, then installs CourtOS inside it.' : 'Tap to install CourtOS on your device.'}
               </p>
             </>
           ) : (

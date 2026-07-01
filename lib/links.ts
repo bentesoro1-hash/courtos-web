@@ -22,5 +22,8 @@ export const ANDROID_URL = (process.env.NEXT_PUBLIC_ANDROID_URL || '').trim()
 /** True once a public install link exists — flips every CTA to direct-install. */
 export const HAS_INSTALL = TESTFLIGHT_URL.length > 0
 
+/** True once a public Android testing link exists — shows the Android CTA. */
+export const HAS_ANDROID = ANDROID_URL.length > 0
+
 /** Best primary install target (iPhone first; this is an iOS-first launch). */
 export const INSTALL_URL = TESTFLIGHT_URL || ANDROID_URL
