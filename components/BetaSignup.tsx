@@ -17,11 +17,16 @@ const ROLES = [
   { value: 'just_interested', label: '👀 Just Interested' },
 ]
 
-type FormData = { name: string; email: string; organization: string; role: string; message: string }
-type FormErrors = Partial<Record<'name' | 'email' | 'role', string>>
+const PLATFORMS = [
+  { value: 'ios', label: '📱 iPhone (iOS)' },
+  { value: 'android', label: '🤖 Android' },
+]
+
+type FormData = { name: string; email: string; organization: string; role: string; platform: string; message: string }
+type FormErrors = Partial<Record<'name' | 'email' | 'role' | 'platform', string>>
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
-const EMPTY: FormData = { name: '', email: '', organization: '', role: '', message: '' }
+const EMPTY: FormData = { name: '', email: '', organization: '', role: '', platform: '', message: '' }
 
 function validate(data: FormData): FormErrors {
   const errors: FormErrors = {}
@@ -29,6 +34,7 @@ function validate(data: FormData): FormErrors {
   if (!data.email.trim()) errors.email = 'Email is required'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'Enter a valid email'
   if (!data.role) errors.role = 'Please select a role'
+  if (!data.platform) errors.platform = 'Please pick your phone'
   return errors
 }
 
@@ -61,6 +67,11 @@ export default function BetaSignup() {
     if (errors.role) setErrors(prev => ({ ...prev, role: undefined }))
   }
 
+  function selectPlatform(value: string) {
+    setFormData(prev => ({ ...prev, platform: value }))
+    if (errors.platform) setErrors(prev => ({ ...prev, platform: undefined }))
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const v = validate(formData)
@@ -73,7 +84,7 @@ export default function BetaSignup() {
         organization: formData.organization.trim() || null,
         coaching_level: formData.role,
         frustration: formData.message.trim() || null,
-        source: 'courtos.co/beta',
+        source: `courtos.co/beta-${formData.platform || 'unknown'}`,
       }])
       if (error) throw error
       await fetch('/api/notify-signup', {
@@ -84,6 +95,7 @@ export default function BetaSignup() {
           email: formData.email,
           organization: formData.organization,
           coaching_level: formData.role,
+          platform: formData.platform,
           frustration: formData.message,
         }),
       })
@@ -309,6 +321,45 @@ export default function BetaSignup() {
                 onBlur={e => (e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#2a2a2a')}
               />
               {errors.email && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{errors.email}</p>}
+            </div>
+
+            {/* Platform */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', color: '#aaa', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                Which phone? <span style={{ color: '#3DBE6B' }}>*</span>
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {PLATFORMS.map(p => {
+                  const selected = formData.platform === p.value
+                  return (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => selectPlatform(p.value)}
+                      style={{
+                        padding: '12px',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        fontWeight: 700,
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        background: selected ? 'rgba(61,190,107,0.12)' : '#1a1a1a',
+                        border: `1px solid ${selected ? '#3DBE6B' : '#2a2a2a'}`,
+                        color: selected ? '#3DBE6B' : '#888',
+                      }}
+                    >
+                      {p.label}
+                    </button>
+                  )
+                })}
+              </div>
+              {formData.platform === 'android' && (
+                <p style={{ color: '#3DBE6B', fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
+                  🤖 For Android, use the <strong>Google account email on your phone</strong> in the field above — beta access runs through Google Play, so it has to be a Google account (not Yahoo, AOL, or iCloud).
+                </p>
+              )}
+              {errors.platform && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 8 }}>{errors.platform}</p>}
             </div>
 
             {/* Role selector */}

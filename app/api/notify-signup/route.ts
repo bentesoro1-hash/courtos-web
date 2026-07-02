@@ -19,6 +19,7 @@ export async function POST(req: Request) {
         <p><strong>Email:</strong> ${body.email}</p>
         <p><strong>Club/Team:</strong> ${body.organization}</p>
         <p><strong>Level:</strong> ${body.coaching_level}</p>
+        <p><strong>Platform:</strong> ${body.platform === 'ios' ? '📱 iPhone (iOS)' : body.platform === 'android' ? '🤖 Android' : (body.platform || '—')}</p>
         <p><strong>Notes:</strong> ${body.frustration}</p>
       `,
     });
@@ -31,8 +32,11 @@ export async function POST(req: Request) {
   //    no code change needed. Optional ANDROID_TEST_LINK adds a second button.
   const testflightLink = process.env.TESTFLIGHT_LINK;
   const androidLink = process.env.ANDROID_TEST_LINK;
+  // Tailor the welcome email to the phone they picked; fall back to both if unknown.
+  const showIos = !!testflightLink && body.platform !== 'android';
+  const showAndroid = !!androidLink && body.platform !== 'ios';
 
-  if ((testflightLink || androidLink) && body.email) {
+  if ((showIos || showAndroid) && body.email) {
     const firstName = (body.name || '').trim().split(/\s+/)[0] || 'Coach';
     const button = (href: string, label: string) => `
       <a href="${href}" style="display:inline-block;background:#3DBE6B;color:#000;
@@ -55,13 +59,13 @@ export async function POST(req: Request) {
               Your entire coaching staff, in one tap. Install CourtOS on your phone
               and start running matches from the sideline.
             </p>
-            ${testflightLink ? `<p style="margin:0 0 6px;">${button(testflightLink, 'Install on iPhone (TestFlight)')}</p>` : ''}
-            ${androidLink ? `<p style="margin:0 0 6px;">${button(androidLink, 'Install on Android')}</p>` : ''}
-            ${testflightLink ? `<p style="${note}">
+            ${showIos ? `<p style="margin:0 0 6px;">${button(testflightLink!, 'Install on iPhone (TestFlight)')}</p>` : ''}
+            ${showAndroid ? `<p style="margin:0 0 6px;">${button(androidLink!, 'Install on Android')}</p>` : ''}
+            ${showIos ? `<p style="${note}">
               On iPhone you'll first install Apple's free <strong>TestFlight</strong> app, then the link
               opens CourtOS inside it.
             </p>` : ''}
-            ${androidLink ? `<p style="${note}">
+            ${showAndroid ? `<p style="${note}">
               On Android, make sure you signed up with the <strong>Google account email on your phone</strong> —
               that's how we grant beta access. We're adding you now; if the button says "not a tester" yet,
               give it a few hours and tap it again.
