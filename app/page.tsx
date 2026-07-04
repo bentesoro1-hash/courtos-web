@@ -5,7 +5,6 @@ import NoAssistantNeeded from '@/components/NoAssistantNeeded'
 import Agitation from '@/components/Agitation'
 import AppTease from '@/components/AppTease'
 import FeatureShowcase from '@/components/FeatureShowcase'
-import FeatureGallery from '@/components/FeatureGallery'
 import FeaturesSection from '@/components/FeaturesSection'
 import HowItWorks from '@/components/HowItWorks'
 import BetaSignup from '@/components/BetaSignup'
@@ -61,7 +60,6 @@ export default function Home() {
         <Agitation />
         <AppTease />
         <FeatureShowcase />
-        <FeatureGallery />
         <FeaturesSection />
         <HowItWorks />
         <BetaSignup />

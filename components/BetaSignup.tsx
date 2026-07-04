@@ -199,8 +199,9 @@ export default function BetaSignup() {
                 {HAS_INSTALL ? 'First time on iPhone? The link opens in Apple’s free TestFlight app, then installs CourtOS inside it.' : 'Tap to install CourtOS on your device.'}
               </p>
               {ANDROID_SIGNUP && !ANDROID_IS_DIRECT && (
-                <p style={{ color: '#3DBE6B', fontSize: 13, fontWeight: 600, marginBottom: 28 }}>
-                  🤖 On Android? Your beta invite steps are on the way by email.
+                <p style={{ color: '#3DBE6B', fontSize: 13, fontWeight: 600, marginBottom: 28, lineHeight: 1.6 }}>
+                  🤖 On Android? Check your email for the install steps. Heads up: Google Play can
+                  take up to about an hour to activate your access after you opt in — totally normal.
                 </p>
               )}
             </>
