@@ -22,6 +22,20 @@ const PLATFORMS = [
   { value: 'android', label: '🤖 Android' },
 ]
 
+// Common consumer domains that are almost never Google accounts. Android beta
+// access runs through Google Play, so testers must use the Google account on
+// their phone (nearly always a @gmail.com) — warn (don't block) on these.
+const NON_GOOGLE_DOMAINS = [
+  'yahoo.com', 'ymail.com', 'aol.com', 'icloud.com', 'me.com', 'mac.com',
+  'hotmail.com', 'outlook.com', 'live.com', 'msn.com', 'comcast.net',
+  'verizon.net', 'att.net', 'sbcglobal.net', 'cox.net', 'charter.net',
+  'protonmail.com', 'proton.me', 'gmx.com', 'mail.com',
+]
+function isLikelyNonGoogle(email: string): boolean {
+  const domain = email.trim().toLowerCase().split('@')[1]
+  return !!domain && NON_GOOGLE_DOMAINS.includes(domain)
+}
+
 type FormData = { name: string; email: string; organization: string; role: string; platform: string; message: string }
 type FormErrors = Partial<Record<'name' | 'email' | 'role' | 'platform', string>>
 type Status = 'idle' | 'submitting' | 'success' | 'error'
@@ -311,7 +325,7 @@ export default function BetaSignup() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="coach@clubname.com"
+                placeholder={formData.platform === 'android' ? 'yourname@gmail.com' : 'coach@clubname.com'}
                 value={formData.email}
                 onChange={handleChange}
                 style={{
@@ -322,6 +336,15 @@ export default function BetaSignup() {
                 onBlur={e => (e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#2a2a2a')}
               />
               {errors.email && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{errors.email}</p>}
+              {formData.platform === 'android' && isLikelyNonGoogle(formData.email) && (
+                <div style={{ marginTop: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.4)', borderRadius: 8, padding: '10px 12px' }}>
+                  <p style={{ color: '#fbbf24', fontSize: 12.5, fontWeight: 600, margin: 0, lineHeight: 1.55 }}>
+                    ⚠️ This isn&apos;t a Google account. The Android beta runs through Google Play, so it
+                    needs the <strong>Google account signed into your phone</strong> — almost always a{' '}
+                    <strong>@gmail.com</strong>. Enter that Gmail here, or your invite won&apos;t work.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Platform */}
