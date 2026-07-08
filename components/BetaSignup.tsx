@@ -92,7 +92,16 @@ export default function BetaSignup() {
     e.preventDefault()
     const v = validate(formData)
     if (Object.keys(v).length > 0) { setErrors(v); return }
+    // Honeypot — bots fill the hidden field; pretend success, touch nothing.
+    if (honeypot.trim() !== '') { setStatus('success'); return }
     setStatus('submitting')
+    // Throttle the direct signups insert per email (durable RPC). Fails open.
+    try {
+      const { data: ok } = await supabase.rpc('rate_limit_hit', {
+        p_key: `betainsert:${formData.email.trim().toLowerCase()}`, p_max: 3, p_window_seconds: 86400,
+      })
+      if (ok === false) { setStatus('success'); return }
+    } catch { /* limiter unavailable — allow */ }
     try {
       const { error } = await supabase.from('beta_signups').insert([{
         name: formData.name.trim(),

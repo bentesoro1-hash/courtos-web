@@ -163,17 +163,38 @@ Code fixes landed in both repos (pending deploy/migration by Ben):
   and that the Play **Data safety** form + **target-audience** settings match reality. The blog's
   `dangerouslySetInnerHTML` is author-controlled — keep it that way (never feed it user input).
 
+### Round 2 (2026-07-07) — remaining items closed in code
+
+- **Hard per-user daily AI cap (40/day)** added to **all three** AI functions via `rate_limit_hit`
+  — bounds Anthropic cost even if a user spins up many matches. Also added real `getUser()` JWT
+  validation to `match-summary` and `match-captions` (they previously checked header presence only).
+- **Server-side tier enforcement scaffold** — new `entitlements` table (written only by the service
+  role / RevenueCat webhook) + a check in each AI function, **gated behind the `AI_REQUIRE_PRO` env
+  flag** so it's OFF during beta and flips ON at public launch. Closes the "free user calls paid AI"
+  leak once RevenueCat populates the table.
+- **Signup-table insert throttled** — `BetaSignup` now honeypot-checks and rate-limits the direct
+  `beta_signups` insert (3/day per email) via the same RPC, so the DB insert can't be spammed either.
+
+**Still requires you (RevenueCat wiring):** point a RevenueCat webhook at a small handler that upserts
+`entitlements(owner_id, tier)` with the service-role key, then set `AI_REQUIRE_PRO=true` on the
+functions at public launch. Until then the daily cap is the cost ceiling.
+
 ### Deploy / apply steps (Ben)
 
 ```
-# 1. Supabase → SQL editor: run the new migrations
-#    docs/migrations/add_rate_limit.sql
-#    docs/migrations/add_practice_plans.sql
-# 2. Redeploy the edge function
+# 1. Supabase → SQL editor: run the new migrations (in volleyiq-coach/docs/migrations)
+#    add_rate_limit.sql
+#    add_practice_plans.sql
+#    add_entitlements.sql
+# 2. Redeploy ALL THREE edge functions (they now call rate_limit_hit + getUser)
 supabase functions deploy practice-plan
-# 3. courtos-web: push (Vercel auto-deploys the hardened routes)
+supabase functions deploy match-summary
+supabase functions deploy match-captions
+# 3. courtos-web: push (Vercel auto-deploys the hardened routes + throttled signup)
 # 4. Set billing backstops (dashboards): Anthropic usage limit + alert,
 #    Resend monthly cap, Supabase budget alert.
+# 5. (Public launch only) wire RevenueCat webhook -> entitlements table, then set
+#    AI_REQUIRE_PRO=true on the functions:  supabase secrets set AI_REQUIRE_PRO=true
 ```
 
 ## Priority order
