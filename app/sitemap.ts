@@ -3,7 +3,7 @@ import { getAllPosts } from './blog/posts'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://courtos.co'
-  const staticPaths = ['', '/blog', '/privacy', '/terms', '/subscription-terms']
+  const staticPaths = ['', '/blog', '/privacy', '/terms', '/subscription-terms', '/delete-account']
   const staticUrls = staticPaths.map((p) => ({
     url: `${base}${p}`,
     lastModified: new Date(),
