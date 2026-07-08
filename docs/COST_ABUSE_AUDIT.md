@@ -131,6 +131,51 @@ Supabase **budget alert**.
 
 ---
 
+## ✅ Remediation shipped (2026-07-07)
+
+Code fixes landed in both repos (pending deploy/migration by Ben):
+
+- **`practice-plan` locked** — now validates the JWT via `getUser()` (401 on invalid) and caches the
+  plan per match/season with a **CAP of 5 regenerations** (new `practice_plans` table). Claude is no
+  longer called on every request. *(volleyiq-coach)*
+- **Durable rate limiter** — `rate_limit_hit()` SECURITY DEFINER RPC + `rate_limits` table; atomic,
+  callable by the anon web client, no table writable via RLS. *(migration)*
+- **`notify-signup` hardened** — email validation (no send to invalid/missing address, killing the
+  stranger-relay), **per-IP (5/hr) + per-email (3/day) rate limits**, honeypot field (bots dropped
+  silently), 8 KB body cap, field-length caps, and **all user input HTML-escaped**. *(courtos-web)*
+- **`notify-signup` form** — hidden honeypot field added. *(courtos-web BetaSignup)*
+- **`notify-reset` hardened** — per-IP rate limit (10/hr), input clipped + HTML-escaped (incl. the
+  SQL-snippet interpolation). *(courtos-web)*
+
+### Legal / privacy (the "lawsuits" angle) — verified
+
+- ✅ **Minors' names are NOT sent to the AI provider.** All three AI functions send only jersey # +
+  position (verified in `practice-plan`, `match-captions`, `match-summary`). This upholds the stated
+  minors-data rule and is the key privacy exposure — it's clean.
+- ✅ **Minors' data is private by default** (RLS owner-scoped) and the public live-broadcast snapshot
+  is **jersey-only, no names**.
+- ✅ **Legal pages exist** (privacy / terms / subscription-terms) for CourtOS LLC.
+- 🟡 **Direct Supabase signup insert** (`BetaSignup` inserts to a signups table via the anon client
+  before calling the email route) — bounded (DB rows, not email/AI), but it bypasses the email-route
+  rate limit. Consider RLS insert throttling or moving the insert server-side behind the same limiter.
+- ⚠️ **Policy items for you / counsel** (not code): confirm the privacy policy explicitly covers
+  **minors / COPPA-style parental consent**, data-retention (your 30-day soft-delete is a good story),
+  and that the Play **Data safety** form + **target-audience** settings match reality. The blog's
+  `dangerouslySetInnerHTML` is author-controlled — keep it that way (never feed it user input).
+
+### Deploy / apply steps (Ben)
+
+```
+# 1. Supabase → SQL editor: run the new migrations
+#    docs/migrations/add_rate_limit.sql
+#    docs/migrations/add_practice_plans.sql
+# 2. Redeploy the edge function
+supabase functions deploy practice-plan
+# 3. courtos-web: push (Vercel auto-deploys the hardened routes)
+# 4. Set billing backstops (dashboards): Anthropic usage limit + alert,
+#    Resend monthly cap, Supabase budget alert.
+```
+
 ## Priority order
 
 1. 🔴 Rate-limit + validate + escape **`notify-signup`** (and add double opt-in). Public + relay.

@@ -66,6 +66,8 @@ const INPUT_BASE: React.CSSProperties = {
 
 export default function BetaSignup() {
   const [formData, setFormData] = useState<FormData>(EMPTY)
+  // Honeypot — hidden from real users; bots fill it and get silently dropped.
+  const [honeypot, setHoneypot] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
   const [status, setStatus] = useState<Status>('idle')
   const [copied, setCopied] = useState(false)
@@ -111,6 +113,7 @@ export default function BetaSignup() {
           coaching_level: formData.role,
           platform: formData.platform,
           frustration: formData.message,
+          hp: honeypot,
         }),
       })
       setStatus('success')
@@ -293,6 +296,18 @@ export default function BetaSignup() {
           padding: '36px 32px',
         }}>
           <form onSubmit={handleSubmit} noValidate>
+
+            {/* Honeypot — off-screen, aria-hidden; real users never fill it. */}
+            <input
+              type="text"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+            />
 
             {/* Name */}
             <div style={{ marginBottom: 20 }}>

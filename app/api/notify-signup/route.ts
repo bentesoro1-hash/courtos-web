@@ -1,5 +1,35 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+// ── Abuse controls ────────────────────────────────────────────────────────────
+// This endpoint is public and sends Resend email, so it is rate-limited (durable,
+// via a Supabase SECURITY DEFINER RPC), validated, honeypot-gated, and every user
+// value is HTML-escaped before it goes into an email.
+const MAX_BODY_BYTES = 8 * 1024;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const esc = (v: unknown) =>
+  String(v ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const clip = (v: unknown, n: number) => String(v ?? '').slice(0, n);
+
+function rlClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return url && key ? createClient(url, key) : null;
+}
+// Returns true if allowed. Fails OPEN (allow) if the limiter is unavailable, so a
+// limiter outage never blocks real signups.
+async function allowed(key: string, max: number, windowSeconds: number) {
+  const sb = rlClient();
+  if (!sb) return true;
+  try {
+    const { data, error } = await sb.rpc('rate_limit_hit', { p_key: key, p_max: max, p_window_seconds: windowSeconds });
+    if (error) return true;
+    return data !== false;
+  } catch { return true; }
+}
 
 // ── Install links (set in Vercel → Settings → Environment Variables) ──────────
 //   TESTFLIGHT_LINK   iOS TestFlight public/opt-in URL
@@ -28,12 +58,37 @@ const WRAP = (inner: string) => `
   </div>`;
 
 export async function POST(req: Request) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const body = await req.json();
+  // Reject oversized bodies before parsing.
+  const len = Number(req.headers.get('content-length') ?? 0);
+  if (len && len > MAX_BODY_BYTES) return NextResponse.json({ error: 'Too large' }, { status: 413 });
 
-  const platform: string = body.platform || '';
-  const firstName = (body.name || '').trim().split(/\s+/)[0] || 'Coach';
-  const email: string = (body.email || '').trim();
+  let body: Record<string, unknown>;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: 'Bad request' }, { status: 400 }); }
+
+  // Honeypot: bots fill the hidden field. Pretend success, send nothing.
+  if (typeof body.hp === 'string' && body.hp.trim() !== '') return NextResponse.json({ ok: true });
+
+  const platform: string = clip(body.platform, 20);
+  const email: string = clip(body.email, 200).trim().toLowerCase();
+
+  // Validate email up front — the welcome email goes to this address, so a bad or
+  // missing address means we don't send anything (kills the "mail a stranger" relay).
+  if (!EMAIL_RE.test(email)) return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
+
+  // Rate limit: per-IP and per-email, durable across serverless instances.
+  const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+  const okIp = await allowed(`signup:ip:${ip}`, 5, 3600);
+  const okEmail = await allowed(`signup:email:${email}`, 3, 86400);
+  if (!okIp || !okEmail) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  // Sanitize everything that reaches an email body.
+  const name = clip(body.name, 100);
+  const firstName = esc(name.trim().split(/\s+/)[0] || 'Coach');
+  const organization = clip(body.organization, 120);
+  const coachingLevel = clip(body.coaching_level, 60);
+  const frustration = clip(body.frustration, 1000);
 
   // 1) Notify the CourtOS team. Android signups are flagged in the subject so
   //    they're easy to triage (they may need a manual add if the group isn't self-serve).
@@ -46,12 +101,12 @@ export async function POST(req: Request) {
         : '🏐 New CourtOS Beta Signup!',
       html: `
         <h2>New Beta Signup</h2>
-        <p><strong>Name:</strong> ${body.name}</p>
-        <p><strong>Email:</strong> ${body.email}</p>
-        <p><strong>Club/Team:</strong> ${body.organization}</p>
-        <p><strong>Level:</strong> ${body.coaching_level}</p>
-        <p><strong>Platform:</strong> ${platform === 'ios' ? '📱 iPhone (iOS)' : platform === 'android' ? '🤖 Android' : (platform || '—')}</p>
-        <p><strong>Notes:</strong> ${body.frustration}</p>
+        <p><strong>Name:</strong> ${esc(name)}</p>
+        <p><strong>Email:</strong> ${esc(email)}</p>
+        <p><strong>Club/Team:</strong> ${esc(organization)}</p>
+        <p><strong>Level:</strong> ${esc(coachingLevel)}</p>
+        <p><strong>Platform:</strong> ${platform === 'ios' ? '📱 iPhone (iOS)' : platform === 'android' ? '🤖 Android' : (esc(platform) || '—')}</p>
+        <p><strong>Notes:</strong> ${esc(frustration)}</p>
       `,
     });
   } catch {
