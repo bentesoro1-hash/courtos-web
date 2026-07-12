@@ -129,6 +129,87 @@ export const posts: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: 'volleyball-stat-abbreviations-explained',
+    title: 'Volleyball Stat Abbreviations Explained (K, E, TA, A…)',
+    description:
+      "A coach's plain-English guide to volleyball stat abbreviations — K, E, TA, A, D, BS, BA, SA — plus the formulas and what counts as good.",
+    date: '2026-07-08',
+    readingMinutes: 8,
+    excerpt:
+      'What K, E, TA, PCT, A, SA, RE, D, BS and BA actually mean, the formulas behind hitting percentage and passing average, and what counts as a good number by level.',
+    html: `
+<p>Open any volleyball box score and you're staring at a wall of letters: K, E, TA, PCT, A, SA, SE, RE, D, BS, BA. If you've ever nodded along in a coaches' meeting while quietly wondering what half of them mean, this guide is for you. Below is every common abbreviation, what it actually measures, how the calculated ones are figured, and what counts as a &ldquo;good&rdquo; number by level — all in plain English.</p>
+
+<h2>Why the abbreviations matter</h2>
+<p>Stats only help you coach if you trust what they're telling you. A player with 12 kills sounds great until you see 11 errors next to them — the abbreviations are the difference between &ldquo;she's carrying us&rdquo; and &ldquo;she's a coin flip.&rdquo; Learn the shorthand once and every scoresheet, app, and recruiting profile suddenly reads like a sentence instead of a code. We'll group them the way a match actually unfolds: attacking, setting, serving, passing, digging, and blocking.</p>
+
+<h2>Attacking stats</h2>
+<p>Attacking is where most of the alphabet lives, because hitting efficiency is one of the two or three stats that most reliably tracks with winning.</p>
+<ul>
+<li><strong>K — Kill.</strong> An attack that directly ends the rally in your team's favor: it hits the floor, goes off the block out of bounds, or forces a blocking error.</li>
+<li><strong>E — Error (attack error).</strong> An attack that directly loses the rally — into the net, out of bounds, blocked straight down, or an illegal contact. Every error is a point for the other team.</li>
+<li><strong>TA — Total Attempts.</strong> Every swing a player takes, regardless of outcome: kills, errors, and swings that stay in play. TA is the denominator that makes kills meaningful.</li>
+<li><strong>PCT (Hitting %) — Hitting Percentage.</strong> The most important attacking number, calculated as <strong>(Kills − Errors) ÷ Total Attempts</strong>.</li>
+</ul>
+<p>So a hitter with 10 kills, 2 errors, and 20 attempts is at (10 − 2) ÷ 20 = <strong>.400</strong>. Because errors subtract, a player can post a negative hitting percentage if they make more errors than kills — a sign to run the offense elsewhere.</p>
+<p>What's a good hitting percentage? As a rough guide across competitive play: <strong>.300 and up is excellent, .200+ is solid, and anything under .100 usually means a hitter is giving away more than they're earning.</strong> Elite college and pro attackers live in the .300s; a strong high-school or club hitter clearing .250 is doing real damage. Middle blockers, who get cleaner sets, typically post higher percentages than pins.</p>
+
+<h2>Setting stats</h2>
+<ul>
+<li><strong>A — Assist.</strong> Credited to the player (almost always the setter) whose set leads directly to a kill. Assists are the setter's version of kills.</li>
+<li><strong>BHE — Ball-Handling Error.</strong> A double, a lift, or a thrown set called by the referee — the setter's equivalent of an attack error, and a point for the opponent.</li>
+</ul>
+
+<h2>Serving stats</h2>
+<ul>
+<li><strong>SA — Service Ace.</strong> A serve that directly wins the point — the opponent can't return it, or the pass is so bad they can't make a legal attack.</li>
+<li><strong>SE — Service Error.</strong> A serve that ends the rally in the opponent's favor: into the net, long, wide, or a foot fault.</li>
+</ul>
+<p><strong>Serving %</strong> is usually serves in play divided by total serve attempts. A common high-school target is keeping this <strong>above 90%</strong> — you can't ace a serve you never put in the court. Some systems also grade each serve on a <strong>0–4 scale</strong> (0 = error, 4 = ace) to measure how much pressure a server applies, not just whether it landed.</p>
+
+<h2>Passing and serve-receive stats</h2>
+<ul>
+<li><strong>RE — Reception Error.</strong> A serve-receive that gives the serving team an immediate point — a shanked pass or an ace against you.</li>
+</ul>
+<p><strong>Passing average</strong> is graded per contact and averaged. On the common <strong>3-point scale</strong>: a <strong>3</strong> is a perfect pass (setter has all options), a <strong>2</strong> is playable, a <strong>1</strong> is an emergency pass (usually a free ball back), and a <strong>0</strong> is an ace against you. A team passing around <strong>2.3+</strong> is in good shape to run its full offense. (Some programs use a 0–4 scale — same idea, wider range.) Serve-receive efficiency and hitting percentage are widely treated as the two stats that most decide matches: win the serve-pass battle and you get to run your offense while denying theirs.</p>
+
+<h2>Digging and defense</h2>
+<ul>
+<li><strong>D — Dig.</strong> A successful defensive play on an opponent's attack that keeps the ball off your floor and in play. Digs measure back-row defense and effort.</li>
+</ul>
+
+<h2>Blocking stats</h2>
+<p>Blocking is where two abbreviations trip people up, because a block can be credited to one player or shared.</p>
+<ul>
+<li><strong>BS — Block Solo.</strong> A block that wins the point outright with only one blocker touching the ball.</li>
+<li><strong>BA — Block Assist.</strong> A point-winning block where two or three players are all part of the touch. Each participating blocker gets a block assist — which is why a stat sheet can show more total blocks than points the team actually scored.</li>
+<li><strong>BE — Blocking Error.</strong> A net touch, a reach-over, or a block that sends the ball out on your side — a point for the opponent.</li>
+</ul>
+<p><strong>Total Blocks</strong> are counted differently across programs — some count solos plus half of each assist, others count every participation. If you're comparing players across teams, check the definition before reading too much into the number.</p>
+
+<h2>Putting it together: reading a stat line</h2>
+<p>Here's a sample line — <strong>Jersey 12 — K: 14, E: 4, TA: 30, PCT: .333, D: 9, BS: 1, BA: 3</strong> — and how to read it: 14 kills against 4 errors on 30 swings for a .333 hitting percentage (an excellent, efficient night), plus 9 digs, one solo block, and three block assists. One line, a full picture of a well-rounded pin hitter.</p>
+
+<h2>Track the stats without missing the match</h2>
+<p>Knowing the abbreviations is step one. The harder part is capturing them live — most coaches try to score, call subs, follow the rotation, <strong>and</strong> mark stats on paper at the same time, and the numbers are the first thing to slip at 24–24.</p>
+<p><a href="/">CourtOS</a> is built to take that off your clipboard. You tag each contact with one tap and it does the math for you — hitting percentage, passing average, serve-receive efficiency, and blocks all update in real time, so you get an accurate stat line the moment the set ends instead of reconstructing it from memory on the drive home. Because scoring, rotations, and stats live in the same place, you're watching your team play instead of bookkeeping. You can see the live stat tracking on the <a href="/#in-action">CourtOS home page</a>.</p>
+`,
+    faqs: [
+      {
+        q: 'What does TA mean in volleyball stats?',
+        a: 'TA stands for Total Attempts — every attack swing a hitter takes, whether it is a kill, an error, or a ball that stays in play. It is the denominator in the hitting percentage formula.',
+      },
+      {
+        q: 'How do you calculate hitting percentage?',
+        a: 'Subtract attack errors from kills, then divide by total attempts: (Kills − Errors) ÷ Total Attempts. A player with 10 kills, 2 errors, and 20 attempts hits .400. A hitting percentage of .300 or higher is excellent.',
+      },
+      {
+        q: 'What is the difference between BS and BA in volleyball?',
+        a: 'BS is a Block Solo — a point-winning block with one blocker. BA is a Block Assist — a point-winning block where two or more players share the touch, and each of them is credited with an assist.',
+      },
+    ],
+  },
 ]
 
 export const getPost = (slug: string) => posts.find((p) => p.slug === slug)
