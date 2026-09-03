@@ -10,7 +10,7 @@ export default function Footer() {
           <Image src="/logo.png" alt="CourtOS" width={125} height={22} style={{ height: 22, width: 'auto' }} />
         </a>
         <div style={{ display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
-          {[['/#features', 'Features'], ['/#how-it-works', 'How It Works'], ['/#beta', 'Beta'], ['/privacy', 'Privacy'], ['/terms', 'Terms'], ['/subscription-terms', 'Subscription Terms']].map(([href, label]) => (
+          {[['/#features', 'Features'], ['/#how-it-works', 'How It Works'], ['/#beta', 'Beta'], ['/support', 'Support'], ['/privacy', 'Privacy'], ['/terms', 'Terms'], ['/subscription-terms', 'Subscription Terms']].map(([href, label]) => (
             <a key={href} href={href} style={{ color: '#666', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#C0C0C0')}
               onMouseLeave={e => (e.currentTarget.style.color = '#666')}
