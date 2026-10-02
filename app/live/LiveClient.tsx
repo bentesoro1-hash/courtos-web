@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { LIVE_POLL_MS, classifyLiveRoomReply, cleanRoomCode } from '@/lib/liveRoom'
 
 interface LivePlayerLine {
   id: string
@@ -163,9 +164,8 @@ function buildStory(players: LivePlayerLine[], run: { us: boolean; len: number }
   return out.slice(0, 3)
 }
 
+// Viewer fields returned by the get_live_match RPC (security audit P1-2).
 interface LiveMatch {
-  id: string
-  room_code: string
   team_name: string
   opponent_name: string
   our_score: number
@@ -177,7 +177,6 @@ interface LiveMatch {
   current_rotation: number
   court_mode: string
   is_active: boolean
-  last_updated: string | null
   stats_snapshot: LiveStatsSnapshot | null
 }
 
@@ -249,7 +248,11 @@ export default function LiveClient() {
   const [viewRot, setViewRot] = useState<number | null>(null) // null = follow live rotation
   const [mapFilter, setMapFilter] = useState<'all' | 'kill' | 'ace' | 'error'>('all')
 
-  const channelRef = useRef<any>(null)
+  // Room-code polling state (replaces the realtime table subscription; P1-2).
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const roomRef = useRef<string | null>(null)
+  const versionRef = useRef<string | null>(null)
+  const inFlightRef = useRef(false)
 
   // Persist the parent's followed player across visits.
   useEffect(() => {
@@ -271,63 +274,84 @@ export default function LiveClient() {
     return () => clearInterval(t)
   }, [])
 
-  useEffect(() => {
-    return () => {
-      if (channelRef.current) supabase.removeChannel(channelRef.current)
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current)
+      pollRef.current = null
     }
   }, [])
 
+  useEffect(() => stopPolling, [stopPolling])
+
+  // One poll of the room being watched. The RPC answers {unchanged} when nothing
+  // moved, the full viewer payload when something did, and null once the coach
+  // ends the broadcast (or the room expires).
+  const pollRoom = useCallback(async (clean: string) => {
+    if (inFlightRef.current || roomRef.current !== clean) return
+    inFlightRef.current = true
+    try {
+      const { data, error } = await (supabase as any).rpc('get_live_match', {
+        p_room_code: clean,
+        p_known_version: versionRef.current,
+      })
+      if (roomRef.current !== clean) return
+      const reply = classifyLiveRoomReply(data, error)
+      if (reply.kind === 'update') {
+        versionRef.current = reply.version
+        setMatchData(reply.data as unknown as LiveMatch)
+        setLastUpdated(new Date())
+        if (reply.data.is_active !== true) {
+          stopPolling()
+          setPageState('ended')
+        }
+      } else if (reply.kind === 'gone') {
+        stopPolling()
+        setPageState('ended')
+      }
+      // 'unchanged' or a transient error: keep the last good state; the next tick retries.
+    } catch {
+      // Network hiccup: keep watching and retry on the next tick.
+    } finally {
+      inFlightRef.current = false
+    }
+  }, [stopPolling])
+
+  // A room is read ONLY through the get_live_match RPC with its room code
+  // (security audit P1-2). The public key cannot select the live_matches table,
+  // so there is no direct query and no realtime table stream.
   const connectToRoom = useCallback(async (code: string) => {
-    const clean = code.toUpperCase().replace(/[^A-Z0-9]/g, '')
+    const clean = cleanRoomCode(code)
     if (clean.length < 6) return
 
+    stopPolling()
+    roomRef.current = clean
+    versionRef.current = null
     setPageState('loading')
     setErrorMsg('')
 
     try {
-      const { data, error } = await (supabase as any)
-        .from('live_matches')
-        .select('*')
-        .eq('room_code', clean)
-        .eq('is_active', true)
-        .single()
-
-      if (error || !data) {
+      const { data, error } = await (supabase as any).rpc('get_live_match', { p_room_code: clean })
+      if (roomRef.current !== clean) return
+      const reply = classifyLiveRoomReply(data, error)
+      if (reply.kind !== 'update' || reply.data.is_active !== true) {
+        roomRef.current = null
         setPageState('error')
         setErrorMsg('Room not found. Check the code and try again.')
         return
       }
 
-      const match = data as LiveMatch
-      setMatchData(match)
+      versionRef.current = reply.version
+      setMatchData(reply.data as unknown as LiveMatch)
       setLastUpdated(new Date())
       setActiveCode(clean)
-      setPageState(match.is_active ? 'watching' : 'ended')
-
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current)
-      }
-
-      const channel = supabase
-        .channel(`live_match_${clean}`)
-        .on('postgres_changes' as any, {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'live_matches',
-          filter: `room_code=eq.${clean}`,
-        }, (payload: { new: LiveMatch }) => {
-          setMatchData(payload.new)
-          setLastUpdated(new Date())
-          if (!payload.new.is_active) setPageState('ended')
-        })
-        .subscribe()
-
-      channelRef.current = channel
+      setPageState('watching')
+      pollRef.current = setInterval(() => { void pollRoom(clean) }, LIVE_POLL_MS)
     } catch {
+      roomRef.current = null
       setPageState('error')
       setErrorMsg('Room not found. Check the code and try again.')
     }
-  }, [])
+  }, [pollRoom, stopPolling])
 
   // Auto-connect from ?code= URL param
   useEffect(() => {
@@ -358,10 +382,9 @@ export default function LiveClient() {
   }
 
   const handleWatchAnother = () => {
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current)
-      channelRef.current = null
-    }
+    stopPolling()
+    roomRef.current = null
+    versionRef.current = null
     setMatchData(null)
     setInputCode('')
     setPageState('enter')
