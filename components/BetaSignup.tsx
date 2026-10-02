@@ -1,12 +1,6 @@
 'use client'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import { HAS_INSTALL, INSTALL_URL, HAS_ANDROID, ANDROID_URL, ANDROID_IS_DIRECT, ANDROID_SIGNUP } from '@/lib/links'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 const ROLES = [
   { value: 'head_coach', label: '🏐 Head Coach' },
@@ -95,24 +89,11 @@ export default function BetaSignup() {
     // Honeypot — bots fill the hidden field; pretend success, touch nothing.
     if (honeypot.trim() !== '') { setStatus('success'); return }
     setStatus('submitting')
-    // Throttle the direct signups insert per email (durable RPC). Fails open.
+    // The server route records the signup and sends the emails. It owns the rate
+    // limits (server-side, fail closed), so the browser never calls the limiter
+    // or writes to the database itself.
     try {
-      const { data: ok } = await supabase.rpc('rate_limit_hit', {
-        p_key: `betainsert:${formData.email.trim().toLowerCase()}`, p_max: 3, p_window_seconds: 86400,
-      })
-      if (ok === false) { setStatus('success'); return }
-    } catch { /* limiter unavailable — allow */ }
-    try {
-      const { error } = await supabase.from('beta_signups').insert([{
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        organization: formData.organization.trim() || null,
-        coaching_level: formData.role,
-        frustration: formData.message.trim() || null,
-        source: `courtos.co/beta-${formData.platform || 'unknown'}`,
-      }])
-      if (error) throw error
-      await fetch('/api/notify-signup', {
+      const res = await fetch('/api/notify-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -125,6 +106,7 @@ export default function BetaSignup() {
           hp: honeypot,
         }),
       })
+      if (!res.ok) throw new Error(`signup failed (${res.status})`)
       setStatus('success')
     } catch {
       setStatus('error')

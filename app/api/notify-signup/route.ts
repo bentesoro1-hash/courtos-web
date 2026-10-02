@@ -1,11 +1,14 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { clientIp, emailBucketKey, hitRateLimit, serviceRoleClient } from '@/lib/rateLimit.server';
 
 // ── Abuse controls ────────────────────────────────────────────────────────────
-// This endpoint is public and sends Resend email, so it is rate-limited (durable,
-// via a Supabase SECURITY DEFINER RPC), validated, honeypot-gated, and every user
-// value is HTML-escaped before it goes into an email.
+// This endpoint is public: it records the beta signup and sends Resend email.
+// It is validated, honeypot-gated and rate-limited server-side (5/hour per IP,
+// 3/day per inbox) through the service-role-only limiter in
+// lib/rateLimit.server.ts, and every user value is HTML-escaped before it goes
+// into an email. The limiter FAILS CLOSED: if it cannot answer, nothing is
+// inserted and nothing is sent.
 const MAX_BODY_BYTES = 8 * 1024;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const esc = (v: unknown) =>
@@ -13,23 +16,8 @@ const esc = (v: unknown) =>
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const clip = (v: unknown, n: number) => String(v ?? '').slice(0, n);
-
-function rlClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return url && key ? createClient(url, key) : null;
-}
-// Returns true if allowed. Fails OPEN (allow) if the limiter is unavailable, so a
-// limiter outage never blocks real signups.
-async function allowed(key: string, max: number, windowSeconds: number) {
-  const sb = rlClient();
-  if (!sb) return true;
-  try {
-    const { data, error } = await sb.rpc('rate_limit_hit', { p_key: key, p_max: max, p_window_seconds: windowSeconds });
-    if (error) return true;
-    return data !== false;
-  } catch { return true; }
-}
+const tooMany = () => NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+const unavailable = () => NextResponse.json({ error: 'Temporarily unavailable' }, { status: 503 });
 
 // ── Install links (set in Vercel → Settings → Environment Variables) ──────────
 //   TESTFLIGHT_LINK   iOS TestFlight public/opt-in URL
@@ -69,26 +57,42 @@ export async function POST(req: Request) {
   if (typeof body.hp === 'string' && body.hp.trim() !== '') return NextResponse.json({ ok: true });
 
   const platform: string = clip(body.platform, 20);
-  const email: string = clip(body.email, 200).trim().toLowerCase();
+  const rawEmail: string = clip(body.email, 200).trim();
+  const email: string = rawEmail.toLowerCase();
 
   // Validate email up front — the welcome email goes to this address, so a bad or
   // missing address means we don't send anything (kills the "mail a stranger" relay).
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
 
-  // Rate limit: per-IP and per-email, durable across serverless instances.
-  const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
-  const okIp = await allowed(`signup:ip:${ip}`, 5, 3600);
-  const okEmail = await allowed(`signup:email:${email}`, 3, 86400);
-  if (!okIp || !okEmail) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  // Rate limit: per-IP, then per-inbox. Durable across serverless instances,
+  // server-side only, and fail closed: no insert and no email unless allowed.
+  const byIp = await hitRateLimit('signup-ip', clientIp(req), 5, 3600);
+  if (byIp !== 'allowed') return byIp === 'limited' ? tooMany() : unavailable();
+  const byEmail = await hitRateLimit('signup-email', emailBucketKey(email), 3, 86400);
+  if (byEmail !== 'allowed') return byEmail === 'limited' ? tooMany() : unavailable();
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  // Sanitize everything that reaches an email body.
+  // Sanitize everything that reaches the database or an email body.
   const name = clip(body.name, 100);
   const firstName = esc(name.trim().split(/\s+/)[0] || 'Coach');
   const organization = clip(body.organization, 120);
   const coachingLevel = clip(body.coaching_level, 60);
   const frustration = clip(body.frustration, 1000);
+
+  // 0) Record the signup. The browser no longer writes beta_signups itself, so the
+  //    limits above gate the insert as well as the emails.
+  const db = serviceRoleClient();
+  if (!db) return unavailable();
+  const { error: insertError } = await db.from('beta_signups').insert([{
+    name: name.trim(),
+    email: rawEmail,
+    organization: organization.trim() || null,
+    coaching_level: coachingLevel,
+    frustration: frustration.trim() || null,
+    source: `courtos.co/beta-${platform === 'ios' || platform === 'android' ? platform : 'unknown'}`,
+  }]);
+  if (insertError) return NextResponse.json({ error: 'Signup failed' }, { status: 500 });
 
   // 1) Notify the CourtOS team. Android signups are flagged in the subject so
   //    they're easy to triage (they may need a manual add if the group isn't self-serve).

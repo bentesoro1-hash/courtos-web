@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { clientIp, hitRateLimit } from '@/lib/rateLimit.server';
 
 const esc = (v: unknown) =>
   String(v ?? '')
@@ -8,24 +8,13 @@ const esc = (v: unknown) =>
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const clip = (v: unknown, n: number) => String(v ?? '').slice(0, n);
 
-async function allowed(key: string, max: number, windowSeconds: number) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const k = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !k) return true;
-  try {
-    const { data, error } = await createClient(url, k)
-      .rpc('rate_limit_hit', { p_key: key, p_max: max, p_window_seconds: windowSeconds });
-    if (error) return true;
-    return data !== false;
-  } catch { return true; }
-}
-
 export async function POST(req: Request) {
   try {
-    const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
-    if (!(await allowed(`reset:ip:${ip}`, 10, 3600))) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-    }
+    // Rate limit: 10/hour per IP. Durable, server-side only (lib/rateLimit.server.ts)
+    // and fail closed: no email is sent unless the limiter allows it.
+    const limit = await hitRateLimit('reset-ip', clientIp(req), 10, 3600);
+    if (limit === 'limited') return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    if (limit !== 'allowed') return NextResponse.json({ error: 'Temporarily unavailable' }, { status: 503 });
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const body = await req.json();
